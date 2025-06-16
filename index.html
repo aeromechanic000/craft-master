@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com https://text.pollinations.ai;
         connect-src 'self' https://text.pollinations.ai https://image.pollinations.ai;
@@ -1393,6 +1395,8 @@
                 item = gameState.craftedStorage[index];
             } else if (type === 'crafting') {
                 item = gameState.craftingGrid[index];
+            } else if (type === 'recycle') {
+                item = gameState.recycleGrid[index];
             }
             
             if (item) {
@@ -1425,22 +1429,44 @@
             const targetIndex = parseInt(slot.dataset.index);
             
             if (dragState.dragging && dragState.draggedItem) {
-                // Remove item from source
-                if (dragState.draggedFrom === 'initial') {
-                    gameState.initialStorage[dragState.draggedIndex] = null;
-                } else if (dragState.draggedFrom === 'crafted') {
-                    gameState.craftedStorage[dragState.draggedIndex] = null;
-                } else if (dragState.draggedFrom === 'crafting') {
-                    gameState.craftingGrid[dragState.draggedIndex] = null;
-                } else if (dragState.draggedFrom === 'recycle') {
-                    gameState.recycleGrid[dragState.draggedIndex] = null;
+                // Check if target slot is empty or if it's a valid drop location
+                let targetStorage = null;
+                let targetItem = null;
+                
+                if (targetType === 'initial') {
+                    targetStorage = gameState.initialStorage;
+                    targetItem = targetStorage[targetIndex];
+                } else if (targetType === 'crafted') {
+                    targetStorage = gameState.craftedStorage;
+                    targetItem = targetStorage[targetIndex];
+                    // Don't allow dropping items from crafting/recycle into crafted storage
+                    if (dragState.draggedFrom === 'crafting' || dragState.draggedFrom === 'recycle') {
+                        resetDragState();
+                        return;
+                    }
+                } else if (targetType === 'crafting') {
+                    targetStorage = gameState.craftingGrid;
+                    targetItem = targetStorage[targetIndex];
+                } else if (targetType === 'recycle') {
+                    targetStorage = gameState.recycleGrid;
+                    targetItem = targetStorage[targetIndex];
                 }
                 
-                // Add item to target
-                if (targetType === 'crafting') {
-                    gameState.craftingGrid[targetIndex] = dragState.draggedItem;
-                } else if (targetType === 'recycle' && !gameState.recycleGrid[targetIndex]) {
-                    gameState.recycleGrid[targetIndex] = dragState.draggedItem;
+                // Only proceed if target slot is empty
+                if (!targetItem) {
+                    // Remove item from source
+                    if (dragState.draggedFrom === 'initial') {
+                        gameState.initialStorage[dragState.draggedIndex] = null;
+                    } else if (dragState.draggedFrom === 'crafted') {
+                        gameState.craftedStorage[dragState.draggedIndex] = null;
+                    } else if (dragState.draggedFrom === 'crafting') {
+                        gameState.craftingGrid[dragState.draggedIndex] = null;
+                    } else if (dragState.draggedFrom === 'recycle') {
+                        gameState.recycleGrid[dragState.draggedIndex] = null;
+                    }
+                    
+                    // Add item to target
+                    targetStorage[targetIndex] = dragState.draggedItem;
                 }
             }
             
@@ -1716,6 +1742,7 @@
             }
         });
     </script>
+
 
 
 </body></html>
