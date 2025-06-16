@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com https://text.pollinations.ai;
+        connect-src 'self' https://text.pollinations.ai https://image.pollinations.ai;
+        frame-src 'self' https://www.youtube.com https://trytako.com;
+        child-src 'self';
+        manifest-src 'self';
+        worker-src 'self';
+        upgrade-insecure-requests;
+        block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craft Master</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #6d9dc5 0%, #8fbc8f 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            min-height: 100vh;
+        }
+
+        .toolbar {
+            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+            padding: 15px 20px;
+            border-bottom: 3px solid #8b4513;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        
+        .title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar h1 {
+            font-size: 20px;
+            color: #ffffff;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .minecraft-decoration {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .minecraft-block {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #000;
+            position: relative;
+            image-rendering: pixelated;
+        }
+
+        .block-dirt {
+            background: linear-gradient(45deg, #8b4513 25%, #a0522d 25%, #a0522d 50%, #8b4513 50%, #8b4513 75%, #a0522d 75%);
+            background-size: 4px 4px;
+        }
+
+        .block-grass {
+            background: linear-gradient(to bottom, #9acd32 0%, #9acd32 30%, #8b4513 30%, #8b4513 70%, #a0522d 70%);
+        }
+
+        .block-stone {
+            background: linear-gradient(45deg, #696969 25%, #808080 25%, #808080 50%, #696969 50%, #696969 75%, #808080 75%);
+            background-size: 3px 3px;
+        }
+
+        .social-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            gap: 6px;
+            color: #1da1f2;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 2px solid #1da1f2;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+            white-space: nowrap;
+        }
+
+        .social-link:hover {
+            background: #1da1f2;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(29, 161, 242, 0.4);
+        }
+
+        .social-icon {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            background: linear-gradient(45deg, #e8f4f8 25%, #f0f8ff 25%, #f0f8ff 50%, #e8f4f8 50%, #e8f4f8 75%, #f0f8ff 75%);
+            background-size: 20px 20px;
+            border-left: 3px solid #8b4513;
+            border-right: 3px solid #8b4513;
+            min-height: 0;
+            overflow: hidden;
+            gap: 3px;
+            padding: 20px;
+        }
+
+        .column {
+            background: rgba(255,255,255,0.9);
+            border: 3px solid #8b4513;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Column 1: Game Info */
+        .column-1 {
+            flex: 0 0 400px;
+            gap: 15px;
+        }
+
+        /* Column 2: Crafting Area */
+        .column-2 {
+            flex: 0 0 600px;
+            margin: 0 10px;
+            align-items: center;
+        }
+
+        /* Column 3: Storage Areas */
+        .column-3 {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4a4a4a;
+            margin-bottom: 15px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-bottom: 2px solid #8b4513;
+            padding-bottom: 8px;
+        }
+
+        .info-card {
+            background: rgba(240, 248, 255, 0.9);
+            border: 2px solid #8b4513;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .info-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-content {
+            font-size: 12px;
+            color: #34495e;
+            line-height: 1.4;
+        }
+
+        .score-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #27ae60;
+            text-align: center;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+        }
+
+        .level-display {
+            font-size: 20px;
+            font-weight: bold;
+            color: #8e44ad;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(200, 200, 200, 0.5);
+            border: 2px solid #8b4513;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .storage-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+            border: 2px solid #8b4513;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .crafted-storage {
+            background: rgba(240, 255, 240, 0.5);
+        }
+
+        .initial-storage {
+            background: rgba(255, 248, 240, 0.5);
+        }
+
+        .storage-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+            padding: 5px;
+            flex: 1;
+        }
+
+        .crafting-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .item-slot {
+            width: 70px;
+            height: 70px;
+            border: 3px solid #8b4513;
+            background: rgba(240, 240, 240, 0.8);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            justify-self: center;
+        }
+
+        .crafting-slot {
+            width: 70px;
+            height: 70px;
+            font-size: 32px;
+            border-radius: 4px;
+        }
+
+        .item-slot:hover {
+            background: rgba(220, 220, 220, 0.9);
+            transform: scale(1.05);
+        }
+
+        .item-slot.occupied {
+            background: rgba(200, 255, 200, 0.9);
+            border-color: #4CAF50;
+        }
+
+        .item-slot.dragging {
+            opacity: 0.5;
+        }
+
+        .item-slot.drop-target {
+            background: rgba(255, 255, 200, 0.9);
+            border-color: #FFD700;
+        }
+
+        /* Item image styling */
+        .item-image {
+            width: 48px;
+            height: 48px;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .result-item .item-image {
+            width: 40px;
+            height: 40px;
+        }
+
+        .recycle-slot .item-image {
+            width: 32px;
+            height: 32px;
+        }
+
+        .item-count {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            font-size: 12px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+            line-height: 1;
+            z-index: 1;
+        }
+
+        /* Updated recipe result styling - more prominent */
+        .craft-result {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 3px solid #f39c12;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #8b4513;
+            flex-wrap: wrap;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .result-item {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #f39c12;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .result-text {
+            font-size: 14px;
+            color: #8b4513;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: 2px solid #8b4513;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-family: 'Courier New', monospace;
+            margin: 3px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn.recycle {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        }
+
+        .btn.recycle:hover {
+            background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+        }
+
+        .status-bar {
+            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+            padding: 12px 20px;
+            font-size: 12px;
+            color: #ffffff;
+            border-top: 3px solid #8b4513;
+            font-family: 'Courier New', monospace;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+            z-index: 10;
+            min-height: 50px;
+            flex-shrink: 0;
+            border-left: 3px solid #8b4513;
+            border-right: 3px solid #8b4513;
+            border-bottom: 3px solid #8b4513;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .level-controls {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Updated recycle section styling - centered */
+        .recycle-section {
+            margin-top: 20px;
+            padding: 20px 15px 15px;
+            border-top: 2px solid #8b4513;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 245, 238, 0.7);
+            border-radius: 8px;
+        }
+
+        .recycle-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+            justify-items: center;
+            align-items: center;
+        }
+
+        .recycle-slot {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #8b4513;
+            background: rgba(255, 220, 220, 0.8);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .recycle-slot:hover {
+            background: rgba(255, 200, 200, 0.9);
+            transform: scale(1.05);
+        }
+
+        .recycle-slot.occupied {
+            background: rgba(255, 180, 180, 0.9);
+            border-color: #ff5722;
+        }
+
+        .hints-list {
+            font-size: 11px;
+            color: #7f8c8d;
+            line-height: 1.3;
+        }
+
+        .hints-list li {
+            margin-bottom: 4px;
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            border-bottom: 1px solid #8b4513;
+            padding-bottom: 8px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading indicator */
+        .loading-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #8b4513;
+            z-index: 1000;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            color: #8b4513;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1400px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .column-1 {
+                flex: 0 0 280px;
+            }
+            
+            .column-2 {
+                flex: 0 0 350px;
+            }
+            
+            .storage-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            
+            .column-1, .column-2, .column-3 {
+                flex: none;
+                margin: 5px 0;
+            }
+            
+            .column-2 {
+                margin: 5px 0;
+            }
+            
+            .storage-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title-bar {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            
+            .social-links {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .social-link {
+                min-width: 120px;
+                font-size: 9px;
+                padding: 4px 8px;
+            }
+            
+            .storage-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .item-slot {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+
+            .item-image {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-indicator" id="loading-indicator">
+        🔄 Loading game data...
+    </div>
+
+    <div class="app-container">
+        <div class="toolbar">
+            <div class="title-bar">
+                <h1>
+                    ⛏️ Craft Master by Minecraft AI
+                    <div class="minecraft-decoration">
+                        <div class="minecraft-block block-grass"></div>
+                        <div class="minecraft-block block-dirt"></div>
+                        <div class="minecraft-block block-stone"></div>
+                    </div>
+                </h1>
+                <div class="social-links">
+                    <a href="https://discord.gg/RKjspnTBmb" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg class="social-icon" viewBox="0 0 24 24">
+                            <path d="M19.952,5.672c-1.904-1.531-4.916-1.79-5.044-1.801c-0.201-0.017-0.392,0.097-0.474,0.281 c-0.006,0.012-0.072,0.163-0.145,0.398c1.259,0.212,2.806,0.64,4.206,1.509c0.224,0.139,0.293,0.434,0.154,0.659 c-0.09,0.146-0.247,0.226-0.407,0.226c-0.086,0-0.173-0.023-0.252-0.072C15.584,5.38,12.578,5.305,12,5.305S8.415,5.38,6.011,6.872 c-0.225,0.14-0.519,0.07-0.659-0.154c-0.14-0.225-0.07-0.519,0.154-0.659c1.4-0.868,2.946-1.297,4.206-1.509 c-0.074-0.236-0.14-0.386-0.145-0.398C9.484,3.968,9.294,3.852,9.092,3.872c-0.127,0.01-3.139,0.269-5.069,1.822 C3.015,6.625,1,12.073,1,16.783c0,0.083,0.022,0.165,0.063,0.237c1.391,2.443,5.185,3.083,6.05,3.111c0.005,0,0.01,0,0.015,0 c0.153,0,0.297-0.073,0.387-0.197l0.875-1.202c-2.359-0.61-3.564-1.645-3.634-1.706c-0.198-0.175-0.217-0.477-0.042-0.675 c0.175-0.198,0.476-0.217,0.674-0.043c0.029,0.026,2.248,1.909,6.612,1.909c4.372,0,6.591-1.891,6.613-1.91 c0.198-0.172,0.5-0.154,0.674,0.045c0.174,0.198,0.155,0.499-0.042,0.673c-0.07,0.062-1.275,1.096-3.634,1.706l0.875,1.202 c0.09,0.124,0.234,0.197,0.387,0.197c0.005,0,0.01,0,0.015,0c0.865-0.027,4.659-0.667,6.05-3.111 C22.978,16.947,23,16.866,23,16.783C23,12.073,20.985,6.625,19.952,5.672z M8.891,14.87c-0.924,0-1.674-0.857-1.674-1.913 s0.749-1.913,1.674-1.913s1.674,0.857,1.674,1.913S9.816,14.87,8.891,14.87z M15.109,14.87c-0.924,0-1.674-0.857-1.674-1.913 s0.749-1.913,1.674-1.913c0.924,0,1.674,0.857,1.674,1.913S16.033,14.87,15.109,14.87z"></path>
+                        </svg>
+                        Discord Server
+                    </a>
+                    <a href="https://github.com/aeromechanic000/note-assistant" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg class="social-icon" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+                        </svg>
+                        GitHub Repository 
+                    </a>
+                    <a href="https://x.com/aeromechan71402" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg class="social-icon" viewBox="0 0 24 24">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+                        </svg>
+                        @aeromechan71402
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Column 1: Game Info -->
+            <div class="column column-1">
+                <div class="section-title">📊 Game Info</div>
+                
+                <div class="info-card">
+                    <div class="info-title">🏆 Score</div>
+                    <div class="score-display" id="total-score">0</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">📊 Level</div>
+                    <div class="level-display" id="current-level-display">1</div>
+                    <div class="info-content" id="level-name">Beginner Crafter</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="level-progress"></div>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">🎯 Current Level</div>
+                    <div class="info-content">
+                        <div>🔨 Crafts left: <span id="crafts-left">5</span></div>
+                        <div>♻️ Recycles left: <span id="recycles-left">5</span></div>
+                        <div>🎯 Target: <span id="target-score">20</span> points</div>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">💡 Crafting Hints</div>
+                    <div class="info-content">
+                        <ul class="hints-list" id="crafting-hints">
+                            <li>🪵 Wood → 4x Planks</li>
+                            <li>🪵🪵 2 Wood → 4x Sticks</li>
+                            <li>⛏️ Pickaxe: 3 materials + 2 sticks</li>
+                            <li>⚔️ Sword: 2 materials + 1 stick</li>
+                            <li>🕯️ Torch: Coal + Stick</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Column 2: Crafting Table and Recycle Area -->
+            <div class="column column-2">
+                <div class="section-title">⚒️ Crafting Table</div>
+                
+                <div class="crafting-grid" id="crafting-grid"></div>
+                
+                <div class="craft-result" id="craft-result">
+                    <span>🎯 Recipe Result: </span>
+                    <div class="result-item" id="result-preview">❓</div>
+                    <div class="result-text" id="result-text">Place items to see recipe</div>
+                </div>
+                
+                <div class="level-controls">
+                    <button class="btn" id="craft-btn" onclick="craftItem()" disabled="">🔨 Craft Item</button>
+                    <button class="btn" onclick="clearCraftingTable()">🗑️ Clear Table</button>
+                    <button class="btn" onclick="nextLevel()">➡️ Next Level</button>
+                </div>
+                
+                <div class="recycle-section">
+                    <div class="section-subtitle">♻️ Recycle Items (Max 5)</div>
+                    <div class="recycle-grid" id="recycle-grid"></div>
+                    <button class="btn recycle" onclick="recycleItems()" id="recycle-btn" disabled="">♻️ Recycle Items</button>
+                </div>
+            </div>
+            
+            <!-- Column 3: Storage Areas -->
+            <div class="column column-3">
+                <!-- Crafted Items (Upper Part) -->
+                <div class="storage-section crafted-storage">
+                    <div class="section-subtitle">✨ Crafted Items</div>
+                    <div class="storage-grid" id="crafted-storage"></div>
+                </div>
+                
+                <!-- Item Storage (Lower Part) -->
+                <div class="storage-section initial-storage">
+                    <div class="section-subtitle">📦 Item Storage</div>
+                    <div class="storage-grid" id="initial-storage"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div id="status-text">🎮 Welcome to Craft Master! Drag items to craft and score points!</div>
+            <div>Level Progress: Complete crafting challenges to advance!</div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            level: 1,
+            craftsLeft: 5,
+            recyclesLeft: 5,
+            totalScore: 0,
+            initialStorage: [],
+            craftedStorage: [],
+            craftingGrid: Array(9).fill(null),
+            recycleGrid: Array(5).fill(null)
+        };
+
+        // Item definitions with emojis and scores - now includes type (item/block)
+        const items = {
+            wood: { emoji: '🪵', score: 1, name: 'Wood', type: 'item' },
+            oak_log: { emoji: '🪵', score: 1, name: 'Oak Log', type: 'block' },
+            stone: { emoji: '🪨', score: 2, name: 'Stone', type: 'block' },
+            iron_ingot: { emoji: '⚙️', score: 5, name: 'Iron Ingot', type: 'item' },
+            iron: { emoji: '⚙️', score: 5, name: 'Iron', type: 'item' },
+            coal: { emoji: '⚫', score: 3, name: 'Coal', type: 'item' },
+            stick: { emoji: '🪵', score: 2, name: 'Stick', type: 'item' },
+            plank: { emoji: '🟫', score: 3, name: 'Plank', type: 'item' },
+            oak_planks: { emoji: '🟫', score: 3, name: 'Oak Planks', type: 'block' },
+            wooden_pickaxe: { emoji: '⛏️', score: 15, name: 'Wooden Pickaxe', type: 'item' },
+            stone_pickaxe: { emoji: '⛏️', score: 18, name: 'Stone Pickaxe', type: 'item' },
+            iron_pickaxe: { emoji: '⛏️', score: 25, name: 'Iron Pickaxe', type: 'item' },
+            pickaxe: { emoji: '⛏️', score: 15, name: 'Pickaxe', type: 'item' },
+            wooden_sword: { emoji: '⚔️', score: 20, name: 'Wooden Sword', type: 'item' },
+            stone_sword: { emoji: '⚔️', score: 25, name: 'Stone Sword', type: 'item' },
+            iron_sword: { emoji: '⚔️', score: 35, name: 'Iron Sword', type: 'item' },
+            sword: { emoji: '⚔️', score: 20, name: 'Sword', type: 'item' },
+            wooden_axe: { emoji: '🪓', score: 18, name: 'Wooden Axe', type: 'item' },
+            stone_axe: { emoji: '🪓', score: 22, name: 'Stone Axe', type: 'item' },
+            axe: { emoji: '🪓', score: 18, name: 'Axe', type: 'item' },
+            torch: { emoji: '🕯️', score: 8, name: 'Torch', type: 'item' },
+            oak_door: { emoji: '🚪', score: 12, name: 'Oak Door', type: 'item' },
+            door: { emoji: '🚪', score: 12, name: 'Door', type: 'item' },
+            chest: { emoji: '📦', score: 25, name: 'Chest', type: 'block' },
+            furnace: { emoji: '🔥', score: 30, name: 'Furnace', type: 'block' },
+            bed: { emoji: '🛏️', score: 22, name: 'Bed', type: 'item' },
+            crafting_table: { emoji: '🪑', score: 16, name: 'Crafting Table', type: 'block' },
+            table: { emoji: '🪑', score: 16, name: 'Crafting Table', type: 'block' }
+        };
+
+        // Image cache to track which images are available
+        const imageCache = new Map();
+
+        // Function to get the correct image path for an item
+        function getItemImagePath(itemType) {
+            const item = items[itemType];
+            if (!item) return null;
+            
+            const folder = item.type === 'block' ? 'block' : 'item';
+            return `./assets/${folder}/${itemType}.png`;
+        }
+
+        // Function to check if an image exists and cache the result
+        async function checkImageExists(imagePath) {
+            if (imageCache.has(imagePath)) {
+                return imageCache.get(imagePath);
+            }
+
+            try {
+                const response = await fetch(imagePath, { method: 'HEAD' });
+                const exists = response.ok;
+                imageCache.set(imagePath, exists);
+                return exists;
+            } catch (error) {
+                imageCache.set(imagePath, false);
+                return false;
+            }
+        }
+
+        // Function to create item display element (image or emoji fallback)
+        async function createItemDisplay(itemType, container, isSmall = false) {
+            const item = items[itemType];
+            if (!item) return;
+
+            // Clear container
+            container.innerHTML = '';
+            
+            const imagePath = getItemImagePath(itemType);
+            let imageExists = false;
+            
+            if (imagePath) {
+                imageExists = await checkImageExists(imagePath);
+            }
+
+            if (imageExists) {
+                const img = document.createElement('img');
+                img.src = imagePath;
+                img.alt = item.name;
+                img.className = 'item-image';
+                img.title = item.name;
+                
+                // Handle image load errors as fallback
+                img.onerror = function() {
+                    console.log(`Image failed to load: ${imagePath}, using emoji fallback`);
+                    container.innerHTML = item.emoji;
+                    imageCache.set(imagePath, false); // Cache the failure
+                };
+                
+                container.appendChild(img);
+            } else {
+                // Use emoji fallback
+                container.textContent = item.emoji;
+            }
+        }
+
+        // Fallback recipes (basic ones in case JSON loading fails)
+        const fallbackRecipes = {
+            'wood': { result: 'plank', count: 4, pattern: ['wood'] },
+            'oak_log': { result: 'oak_planks', count: 4, pattern: ['oak_log'] },
+            'wood,wood': { result: 'stick', count: 4, pattern: ['wood', 'wood'] },
+            'oak_planks,oak_planks': { result: 'stick', count: 4, pattern: ['oak_planks', 'oak_planks'] },
+            'stick,coal': { result: 'torch', count: 4, pattern: ['coal', 'stick'] }
+        };
+
+        // Fallback levels (first 3 levels in case JSON loading fails)
+        const fallbackLevels = [
+            {
+                level: 1,
+                name: "Beginner Crafter",
+                targetScore: 20,
+                craftLimit: 5,
+                recycleLimit: 5,
+                allowedItems: ['oak_log', 'wood', 'stone', 'coal'],
+                initialItemCount: 4
+            },
+            {
+                level: 2,
+                name: "Tool Maker",
+                targetScore: 50,
+                craftLimit: 6,
+                recycleLimit: 4,
+                allowedItems: ['oak_log', 'stone', 'iron_ingot', 'coal', 'stick'],
+                initialItemCount: 5
+            },
+            {
+                level: 3,
+                name: "Builder",
+                targetScore: 80,
+                craftLimit: 7,
+                recycleLimit: 4,
+                allowedItems: ['oak_planks', 'wood', 'stone', 'stick', 'iron_ingot', 'coal'],
+                initialItemCount: 6
+            }
+        ];
+
+        // Game data will be loaded from JSON or use fallback
+        let recipes = {};
+        let levels = [];
+
+        // Drag and drop state
+        let dragState = {
+            dragging: false,
+            draggedItem: null,
+            draggedFrom: null,
+            draggedIndex: null
+        };
+
+        // Load recipes from JSON file
+        async function loadRecipes() {
+            try {
+                const response = await fetch('./recipes.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // Validate the loaded recipes
+                if (data && typeof data === 'object' && data.recipes) {
+                    recipes = data.recipes;
+                    console.log('✅ Recipes loaded from JSON file:', Object.keys(recipes).length, 'recipes');
+                    return true;
+                } else {
+                    throw new Error('Invalid JSON format');
+                }
+            } catch (error) {
+                console.warn('⚠️ Failed to load recipes.json:', error.message);
+                recipes = fallbackRecipes;
+                console.log('📦 Using fallback recipes:', Object.keys(recipes).length, 'recipes');
+                return false;
+            }
+        }
+
+        // Load levels from JSON file
+        async function loadLevels() {
+            try {
+                const response = await fetch('./levels.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // Validate the loaded levels
+                if (data && typeof data === 'object' && Array.isArray(data.levels)) {
+                    levels = data.levels;
+                    console.log('✅ Levels loaded from JSON file:', levels.length, 'levels');
+                    return true;
+                } else {
+                    throw new Error('Invalid JSON format');
+                }
+            } catch (error) {
+                console.warn('⚠️ Failed to load levels.json:', error.message);
+                levels = fallbackLevels;
+                console.log('📦 Using fallback levels:', levels.length, 'levels');
+                return false;
+            }
+        }
+
+        // Load all game data
+        async function loadGameData() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const loadingText = loadingIndicator.querySelector('span') || loadingIndicator;
+            
+            loadingText.textContent = '🔄 Loading recipes...';
+            const recipesLoaded = await loadRecipes();
+            
+            loadingText.textContent = '🔄 Loading levels...';
+            const levelsLoaded = await loadLevels();
+            
+            // Update status based on what was loaded
+            let statusMessage = '🎮 Game initialized! ';
+            if (recipesLoaded && levelsLoaded) {
+                statusMessage += 'All data loaded from JSON files.';
+            } else if (recipesLoaded) {
+                statusMessage += 'Recipes loaded from JSON, using built-in levels.';
+            } else if (levelsLoaded) {
+                statusMessage += 'Levels loaded from JSON, using built-in recipes.';
+            } else {
+                statusMessage += 'Using built-in data (JSON files not found).';
+            }
+            
+            // Hide loading indicator
+            loadingIndicator.style.display = 'none';
+            
+            // Update hints based on loaded recipes
+            updateCraftingHints();
+            
+            updateStatus(statusMessage);
+        }
+
+        // Update crafting hints based on available recipes
+        function updateCraftingHints() {
+            const hintsElement = document.getElementById('crafting-hints');
+            const hints = [];
+            
+            // Generate hints from recipes
+            for (const [key, recipe] of Object.entries(recipes)) {
+                const resultItem = items[recipe.result];
+                if (resultItem) {
+                    if (key === 'wood' || key === 'oak_log') {
+                        hints.push(`🪵 Wood/Log → ${recipe.count}x ${resultItem.name}`);
+                    } else if (key === 'wood,wood' || key === 'oak_planks,oak_planks') {
+                        hints.push(`🪵🪵 2 Planks → ${recipe.count}x ${resultItem.name}`);
+                    } else if (key === 'stick,coal') {
+                        hints.push(`🕯️ ${resultItem.name}: Coal + Stick`);
+                    } else if (recipe.result.includes('pickaxe')) {
+                        hints.push(`⛏️ ${resultItem.name}: 3 materials + 2 sticks`);
+                    } else if (recipe.result.includes('sword')) {
+                        hints.push(`⚔️ ${resultItem.name}: 2 materials + 1 stick`);
+                    } else if (recipe.result === 'chest') {
+                        hints.push(`📦 ${resultItem.name}: 8 planks in hollow square`);
+                    } else if (recipe.result === 'furnace') {
+                        hints.push(`🔥 ${resultItem.name}: 8 stones in hollow square`);
+                    }
+                }
+            }
+            
+            // Limit to 7 hints to fit in the UI
+            const displayHints = hints.slice(0, 7);
+            hintsElement.innerHTML = displayHints.map(hint => `<li>${hint}</li>`).join('');
+        }
+
+        // Function to get random items from allowed items pool
+        function getRandomItems(allowedItems, count) {
+            const selectedItems = [];
+            for (let i = 0; i < count; i++) {
+                const randomItem = allowedItems[Math.floor(Math.random() * allowedItems.length)];
+                selectedItems.push(randomItem);
+            }
+            return selectedItems;
+        }
+
+        // Initialize game
+        async function initGame() {
+            // Load all game data first
+            await loadGameData();
+            
+            // Then initialize the game
+            initializeGrids();
+            loadLevel(1);
+            updateUI();
+        }
+
+        function initializeGrids() {
+            // Initialize crafting grid
+            const craftingGrid = document.getElementById('crafting-grid');
+            craftingGrid.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const slot = createSlot('crafting', i);
+                slot.classList.add('crafting-slot');
+                craftingGrid.appendChild(slot);
+            }
+
+            // Initialize storage grids with fewer slots but larger size (6 columns × 4 rows = 24 slots each)
+            const initialStorage = document.getElementById('initial-storage');
+            const craftedStorage = document.getElementById('crafted-storage');
+            initialStorage.innerHTML = '';
+            craftedStorage.innerHTML = '';
+            
+            for (let i = 0; i < 24; i++) {
+                initialStorage.appendChild(createSlot('initial', i));
+            }
+            for (let i = 0; i < 18; i++) {
+                craftedStorage.appendChild(createSlot('crafted', i));
+            }
+
+            // Initialize recycle grid
+            const recycleGrid = document.getElementById('recycle-grid');
+            recycleGrid.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                recycleGrid.appendChild(createSlot('recycle', i));
+            }
+        }
+
+        function createSlot(type, index) {
+            const slot = document.createElement('div');
+            slot.className = type === 'recycle' ? 'recycle-slot' : 'item-slot';
+            slot.dataset.type = type;
+            slot.dataset.index = index;
+            
+            slot.addEventListener('dragstart', handleDragStart);
+            slot.addEventListener('dragover', handleDragOver);
+            slot.addEventListener('drop', handleDrop);
+            slot.addEventListener('click', handleSlotClick);
+            
+            return slot;
+        }
+
+        function loadLevel(levelNumber) {
+            if (levelNumber > levels.length) {
+                updateStatus('🎉 Congratulations! You completed all levels!');
+                return;
+            }
+
+            const levelConfig = levels[levelNumber - 1];
+            
+            gameState.level = levelNumber;
+            gameState.craftsLeft = levelConfig.craftLimit;
+            gameState.recyclesLeft = levelConfig.recycleLimit;
+            
+            // Clear all grids
+            gameState.initialStorage = [];
+            gameState.craftedStorage = [];
+            gameState.craftingGrid = Array(9).fill(null);
+            gameState.recycleGrid = Array(5).fill(null);
+
+            // Add initial items for this level
+            const initialItems = getRandomItems(levelConfig.allowedItems, levelConfig.initialItemCount);
+            initialItems.forEach(itemType => {
+                addItemToStorage(itemType, 'initial');
+            });
+
+            updateUI();
+            updateStatus(`Level ${levelNumber}: ${levelConfig.name} - Target Score: ${levelConfig.targetScore}`);
+        }
+
+        function addItemToStorage(itemType, storageType) {
+            const storage = storageType === 'initial' ? gameState.initialStorage : gameState.craftedStorage;
+            const emptyIndex = storage.findIndex(item => item === null);
+            
+            if (emptyIndex !== -1) {
+                storage[emptyIndex] = { type: itemType, count: 1 };
+            } else if (storage.length < 24) {
+                storage.push({ type: itemType, count: 1 });
+            }
+        }
+
+        function addRandomItems(count) {
+            const currentLevel = levels[gameState.level - 1];
+            const randomItems = getRandomItems(currentLevel.allowedItems, count);
+            randomItems.forEach(itemType => {
+                addItemToStorage(itemType, 'initial');
+            });
+        }
+
+        // Drag and Drop handlers
+        function handleDragStart(e) {
+            const slot = e.target.closest('.item-slot, .recycle-slot');
+            const type = slot.dataset.type;
+            const index = parseInt(slot.dataset.index);
+            
+            let item = null;
+            if (type === 'initial') {
+                item = gameState.initialStorage[index];
+            } else if (type === 'crafted') {
+                item = gameState.craftedStorage[index];
+            } else if (type === 'crafting') {
+                item = gameState.craftingGrid[index];
+            }
+            
+            if (item) {
+                dragState.dragging = true;
+                dragState.draggedItem = item;
+                dragState.draggedFrom = type;
+                dragState.draggedIndex = index;
+                slot.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            }
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            const slot = e.target.closest('.item-slot, .recycle-slot');
+            if (dragState.dragging && slot) {
+                slot.classList.add('drop-target');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const slot = e.target.closest('.item-slot, .recycle-slot');
+            if (!slot) return;
+            
+            const targetType = slot.dataset.type;
+            const targetIndex = parseInt(slot.dataset.index);
+            
+            if (dragState.dragging && dragState.draggedItem) {
+                // Remove item from source
+                if (dragState.draggedFrom === 'initial') {
+                    gameState.initialStorage[dragState.draggedIndex] = null;
+                } else if (dragState.draggedFrom === 'crafted') {
+                    gameState.craftedStorage[dragState.draggedIndex] = null;
+                } else if (dragState.draggedFrom === 'crafting') {
+                    gameState.craftingGrid[dragState.draggedIndex] = null;
+                } else if (dragState.draggedFrom === 'recycle') {
+                    gameState.recycleGrid[dragState.draggedIndex] = null;
+                }
+                
+                // Add item to target
+                if (targetType === 'crafting') {
+                    gameState.craftingGrid[targetIndex] = dragState.draggedItem;
+                } else if (targetType === 'recycle' && !gameState.recycleGrid[targetIndex]) {
+                    gameState.recycleGrid[targetIndex] = dragState.draggedItem;
+                }
+            }
+            
+            resetDragState();
+            updateUI();
+            checkRecipe();
+        }
+
+        function handleSlotClick(e) {
+            const slot = e.target.closest('.item-slot, .recycle-slot');
+            const type = slot.dataset.type;
+            const index = parseInt(slot.dataset.index);
+            
+            if (type === 'crafting' && gameState.craftingGrid[index]) {
+                const item = gameState.craftingGrid[index];
+                gameState.craftingGrid[index] = null;
+                
+                if (!addItemToStorageArray(item, gameState.initialStorage)) {
+                    addItemToStorageArray(item, gameState.craftedStorage);
+                }
+                
+                updateUI();
+                checkRecipe();
+            } else if (type === 'recycle' && gameState.recycleGrid[index]) {
+                const item = gameState.recycleGrid[index];
+                gameState.recycleGrid[index] = null;
+                
+                if (!addItemToStorageArray(item, gameState.initialStorage)) {
+                    addItemToStorageArray(item, gameState.craftedStorage);
+                }
+                
+                updateUI();
+            }
+        }
+
+        function addItemToStorageArray(item, storageArray) {
+            const emptyIndex = storageArray.findIndex(slot => slot === null);
+            if (emptyIndex !== -1) {
+                storageArray[emptyIndex] = item;
+                return true;
+            } else if (storageArray.length < 24) {
+                storageArray.push(item);
+                return true;
+            }
+            return false;
+        }
+
+        function resetDragState() {
+            dragState.dragging = false;
+            dragState.draggedItem = null;
+            dragState.draggedFrom = null;
+            dragState.draggedIndex = null;
+            
+            document.querySelectorAll('.item-slot, .recycle-slot').forEach(slot => {
+                slot.classList.remove('dragging', 'drop-target');
+            });
+        }
+
+        async function checkRecipe() {
+            const craftingItems = gameState.craftingGrid.filter(item => item !== null);
+            const pattern = gameState.craftingGrid.map(item => item ? item.type : null);
+            
+            let matchedRecipe = null;
+            
+            for (const [key, recipe] of Object.entries(recipes)) {
+                if (arraysEqual(pattern, recipe.pattern)) {
+                    matchedRecipe = recipe;
+                    break;
+                }
+            }
+            
+            if (!matchedRecipe) {
+                const itemCounts = {};
+                craftingItems.forEach(item => {
+                    itemCounts[item.type] = (itemCounts[item.type] || 0) + 1;
+                });
+                
+                const sortedItems = Object.keys(itemCounts).sort();
+                const recipeKey = sortedItems.join(',');
+                
+                if (recipes[recipeKey]) {
+                    matchedRecipe = recipes[recipeKey];
+                }
+            }
+            
+            const resultPreview = document.getElementById('result-preview');
+            const resultText = document.getElementById('result-text');
+            const craftBtn = document.getElementById('craft-btn');
+            
+            if (matchedRecipe && craftingItems.length > 0) {
+                const resultItem = items[matchedRecipe.result];
+                await createItemDisplay(matchedRecipe.result, resultPreview);
+                resultText.textContent = `${resultItem.name} (x${matchedRecipe.count}) - ${resultItem.score * matchedRecipe.count} points`;
+                craftBtn.disabled = gameState.craftsLeft <= 0;
+            } else {
+                resultPreview.innerHTML = '❓';
+                resultText.textContent = craftingItems.length > 0 ? 'No valid recipe' : 'Place items to see recipe';
+                craftBtn.disabled = true;
+            }
+        }
+
+        function arraysEqual(a, b) {
+            if (a.length !== b.length) return false;
+            for (let i = 0; i < a.length; i++) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
+        }
+
+        async function craftItem() {
+            if (gameState.craftsLeft <= 0) return;
+            
+            const craftingItems = gameState.craftingGrid.filter(item => item !== null);
+            const pattern = gameState.craftingGrid.map(item => item ? item.type : null);
+            
+            let matchedRecipe = null;
+            
+            for (const [key, recipe] of Object.entries(recipes)) {
+                if (arraysEqual(pattern, recipe.pattern)) {
+                    matchedRecipe = recipe;
+                    break;
+                }
+            }
+            
+            if (!matchedRecipe) {
+                const itemCounts = {};
+                craftingItems.forEach(item => {
+                    itemCounts[item.type] = (itemCounts[item.type] || 0) + 1;
+                });
+                
+                const sortedItems = Object.keys(itemCounts).sort();
+                const recipeKey = sortedItems.join(',');
+                
+                if (recipes[recipeKey]) {
+                    matchedRecipe = recipes[recipeKey];
+                }
+            }
+            
+            if (matchedRecipe) {
+                const consumedItemsCount = craftingItems.length;
+                gameState.craftingGrid = Array(9).fill(null);
+                
+                const resultItem = items[matchedRecipe.result];
+                for (let i = 0; i < matchedRecipe.count; i++) {
+                    addItemToStorage(matchedRecipe.result, 'crafted');
+                }
+                
+                gameState.totalScore += resultItem.score * matchedRecipe.count;
+                gameState.craftsLeft--;
+                
+                // Add same number of random items as consumed
+                addRandomItems(consumedItemsCount);
+                
+                updateUI();
+                checkRecipe();
+                updateStatus(`Crafted ${matchedRecipe.count}x ${resultItem.name}! +${resultItem.score * matchedRecipe.count} points`);
+            }
+        }
+
+        function recycleItems() {
+            if (gameState.recyclesLeft <= 0) return;
+            
+            const recycledItems = gameState.recycleGrid.filter(item => item !== null);
+            if (recycledItems.length === 0) return;
+            
+            const recycledItemsCount = recycledItems.length;
+            gameState.recycleGrid = Array(5).fill(null);
+            gameState.recyclesLeft--;
+            
+            // Add same number of random items as recycled
+            addRandomItems(recycledItemsCount);
+            
+            updateUI();
+            updateStatus(`Recycled ${recycledItemsCount} items and got new random items!`);
+        }
+
+        function clearCraftingTable() {
+            gameState.craftingGrid.forEach((item, index) => {
+                if (item) {
+                    if (!addItemToStorageArray(item, gameState.initialStorage)) {
+                        addItemToStorageArray(item, gameState.craftedStorage);
+                    }
+                }
+            });
+            gameState.craftingGrid = Array(9).fill(null);
+            updateUI();
+            checkRecipe();
+        }
+
+        function nextLevel() {
+            if (gameState.level < levels.length) {
+                loadLevel(gameState.level + 1);
+            } else {
+                updateStatus('🎉 You have completed all levels! Amazing work!');
+            }
+        }
+
+        async function updateUI() {
+            const currentLevel = levels[gameState.level - 1];
+            
+            // Update info panel
+            document.getElementById('total-score').textContent = gameState.totalScore;
+            document.getElementById('current-level-display').textContent = gameState.level;
+            document.getElementById('level-name').textContent = currentLevel.name;
+            document.getElementById('crafts-left').textContent = gameState.craftsLeft;
+            document.getElementById('recycles-left').textContent = gameState.recyclesLeft;
+            document.getElementById('target-score').textContent = currentLevel.targetScore;
+            
+            // Update progress bar
+            const progress = Math.min((gameState.totalScore / currentLevel.targetScore) * 100, 100);
+            document.getElementById('level-progress').style.width = progress + '%';
+            
+            // Update storage grids
+            await updateStorageDisplay('initial-storage', gameState.initialStorage);
+            await updateStorageDisplay('crafted-storage', gameState.craftedStorage);
+            await updateStorageDisplay('crafting-grid', gameState.craftingGrid);
+            await updateStorageDisplay('recycle-grid', gameState.recycleGrid);
+            
+            // Update recycle button
+            const recycleBtn = document.getElementById('recycle-btn');
+            const hasRecycleItems = gameState.recycleGrid.some(item => item !== null);
+            recycleBtn.disabled = !hasRecycleItems || gameState.recyclesLeft <= 0;
+        }
+
+        async function updateStorageDisplay(gridId, storage) {
+            const grid = document.getElementById(gridId);
+            const slots = grid.children;
+            
+            for (let i = 0; i < slots.length; i++) {
+                const slot = slots[i];
+                const item = storage[i];
+                
+                if (item && items[item.type]) {
+                    await createItemDisplay(item.type, slot);
+                    slot.classList.add('occupied');
+                    slot.draggable = true;
+                    
+                    if (item.count > 1) {
+                        let countElement = slot.querySelector('.item-count');
+                        if (!countElement) {
+                            countElement = document.createElement('div');
+                            countElement.className = 'item-count';
+                            slot.appendChild(countElement);
+                        }
+                        countElement.textContent = item.count;
+                    } else {
+                        const countElement = slot.querySelector('.item-count');
+                        if (countElement) {
+                            countElement.remove();
+                        }
+                    }
+                } else {
+                    slot.innerHTML = '';
+                    slot.classList.remove('occupied');
+                    slot.draggable = false;
+                }
+            }
+        }
+
+        function updateStatus(message) {
+            document.getElementById('status-text').textContent = message;
+        }
+
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+
+
+
+
+</body></html>

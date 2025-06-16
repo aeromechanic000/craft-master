@@ -1,0 +1,84 @@
+{
+  "recipes": {
+    "wood": {
+      "result": "plank",
+      "count": 4,
+      "pattern": ["wood"]
+    },
+    "wood,wood": {
+      "result": "stick",
+      "count": 4,
+      "pattern": ["wood", "wood"]
+    },
+    "stick,stick,wood": {
+      "result": "pickaxe",
+      "count": 1,
+      "pattern": ["wood", "wood", "wood", "stick", "stick"]
+    },
+    "stick,stick,stone": {
+      "result": "pickaxe",
+      "count": 1,
+      "pattern": ["stone", "stone", "stone", "stick", "stick"]
+    },
+    "stick,stick,iron": {
+      "result": "pickaxe",
+      "count": 1,
+      "pattern": ["iron", "iron", "iron", "stick", "stick"]
+    },
+    "stick,wood": {
+      "result": "sword",
+      "count": 1,
+      "pattern": ["wood", "wood", "stick"]
+    },
+    "stick,stone": {
+      "result": "sword",
+      "count": 1,
+      "pattern": ["stone", "stone", "stick"]
+    },
+    "stick,iron": {
+      "result": "sword",
+      "count": 1,
+      "pattern": ["iron", "iron", "stick"]
+    },
+    "stick,stick,wood,wood": {
+      "result": "axe",
+      "count": 1,
+      "pattern": ["wood", "wood", "stick", "wood", "stick"]
+    },
+    "stick,stick,stone,stone": {
+      "result": "axe",
+      "count": 1,
+      "pattern": ["stone", "stone", "stick", "stone", "stick"]
+    },
+    "stick,coal": {
+      "result": "torch",
+      "count": 4,
+      "pattern": ["coal", "stick"]
+    },
+    "plank,plank,plank,plank,plank,plank": {
+      "result": "door",
+      "count": 3,
+      "pattern": ["plank", "plank", "plank", "plank", "plank", "plank"]
+    },
+    "plank,plank,plank,plank,plank,plank,plank,plank": {
+      "result": "chest",
+      "count": 1,
+      "pattern": ["plank", "plank", "plank", "plank", null, "plank", "plank", "plank", "plank"]
+    },
+    "stone,stone,stone,stone,stone,stone,stone,stone": {
+      "result": "furnace",
+      "count": 1,
+      "pattern": ["stone", "stone", "stone", "stone", null, "stone", "stone", "stone", "stone"]
+    },
+    "plank,plank,plank,plank,plank,plank,plank": {
+      "result": "table",
+      "count": 1,
+      "pattern": ["plank", "plank", "plank", "plank", "plank", "plank", null, null, null]
+    },
+    "plank,plank,plank,plank,plank,plank,wood,wood,wood": {
+      "result": "bed",
+      "count": 1,
+      "pattern": ["wood", "wood", "wood", "plank", "plank", "plank", null, null, null]
+    }
+  }
+}

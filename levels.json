@@ -1,0 +1,76 @@
+{
+  "levels": [
+    {
+      "level": 1,
+      "name": "Beginner Crafter",
+      "targetScore": 20,
+      "craftLimit": 5,
+      "recycleLimit": 5,
+      "allowedItems": ["oak_log", "wood", "stone", "coal"],
+      "initialItemCount": 4
+    },
+    {
+      "level": 2,
+      "name": "Tool Maker",
+      "targetScore": 50,
+      "craftLimit": 6,
+      "recycleLimit": 4,
+      "allowedItems": ["oak_log", "stone", "iron_ingot", "coal", "stick"],
+      "initialItemCount": 5
+    },
+    {
+      "level": 3,
+      "name": "Builder",
+      "targetScore": 80,
+      "craftLimit": 7,
+      "recycleLimit": 4,
+      "allowedItems": ["oak_planks", "wood", "stone", "stick", "iron_ingot", "coal"],
+      "initialItemCount": 6
+    },
+    {
+      "level": 4,
+      "name": "Advanced Crafter",
+      "targetScore": 120,
+      "craftLimit": 8,
+      "recycleLimit": 3,
+      "allowedItems": ["oak_log", "stone", "iron_ingot", "coal", "stick", "oak_planks"],
+      "initialItemCount": 6
+    },
+    {
+      "level": 5,
+      "name": "Master Builder",
+      "targetScore": 180,
+      "craftLimit": 10,
+      "recycleLimit": 3,
+      "allowedItems": ["oak_log", "stone", "iron_ingot", "coal", "stick", "oak_planks", "wood"],
+      "initialItemCount": 7
+    },
+    {
+      "level": 6,
+      "name": "Crafting Legend",
+      "targetScore": 250,
+      "craftLimit": 12,
+      "recycleLimit": 2,
+      "allowedItems": ["oak_log", "stone", "iron_ingot", "coal", "stick", "oak_planks", "iron", "wood"],
+      "initialItemCount": 8
+    },
+    {
+      "level": 7,
+      "name": "Minecraft Master",
+      "targetScore": 350,
+      "craftLimit": 15,
+      "recycleLimit": 2,
+      "allowedItems": ["oak_log", "stone", "iron_ingot", "coal", "stick", "oak_planks", "iron", "wood"],
+      "initialItemCount": 10
+    },
+    {
+      "level": 8,
+      "name": "Ultimate Crafter",
+      "targetScore": 500,
+      "craftLimit": 20,
+      "recycleLimit": 1,
+      "allowedItems": ["oak_log", "stone", "iron_ingot", "coal", "stick", "oak_planks", "iron", "wood"],
+      "initialItemCount": 12
+    }
+  ]
+}
