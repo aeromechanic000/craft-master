@@ -12,7 +12,8 @@
         block-all-mixed-content;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Craft Master</title>
+    <title>Craft Master by Minecraft AI</title>
+    <link rel="icon" type="image/x-icon" href="icon.png">
     <style>
         * {
             margin: 0;
@@ -803,7 +804,7 @@
             if (!item) return null;
             
             const folder = item.type === 'block' ? 'block' : 'item';
-            return `./assets/${folder}/${itemType}.png`;
+            return `./items/${itemType}.png`;
         }
 
         // Function to check if an image exists and cache the result
