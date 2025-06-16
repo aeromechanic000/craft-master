@@ -964,40 +964,50 @@
             return filtered;
         }
 
-        // Function to create item display element (image or emoji fallback)
-        async function createItemDisplay(itemType, container, isSmall = false) {
+        // Improved function to create item display element
+        function createItemDisplay(itemType, container) {
             const item = items[itemType];
-            if (!item) return;
+            if (!item) return Promise.resolve();
 
-            // Clear container
+            // Clear container completely first
             container.innerHTML = '';
             
-            const imagePath = getItemImagePath(itemType);
-            let imageExists = false;
-            
-            if (imagePath) {
-                imageExists = await checkImageExists(imagePath);
-            }
-
-            if (imageExists) {
+            // Check if we have a valid image for this item
+            if (validImageItems.has(itemType)) {
+                const imagePath = getItemImagePath(itemType);
                 const img = document.createElement('img');
                 img.src = imagePath;
                 img.alt = item.name;
                 img.className = 'item-image';
                 img.title = item.name;
                 
-                // Handle image load errors as fallback
-                img.onerror = function() {
-                    console.log(`Image failed to load: ${imagePath}, using emoji fallback`);
-                    container.innerHTML = item.emoji;
-                    imageCache.set(imagePath, false); // Cache the failure
-                    validImageItems.delete(itemType); // Remove from valid items
-                };
-                
-                container.appendChild(img);
+                // Return a promise that resolves when image loads or fails
+                return new Promise((resolve) => {
+                    img.onload = function() {
+                        // Ensure container is still empty before adding image
+                        if (container.innerHTML === '') {
+                            container.appendChild(img);
+                        }
+                        resolve();
+                    };
+                    
+                    img.onerror = function() {
+                        console.log(`Image failed to load: ${imagePath}, using emoji fallback`);
+                        // Remove from valid items and use emoji
+                        validImageItems.delete(itemType);
+                        imageCache.set(imagePath, false);
+                        
+                        // Only set emoji if container is still empty
+                        if (container.innerHTML === '') {
+                            container.textContent = item.emoji;
+                        }
+                        resolve();
+                    };
+                });
             } else {
-                // Use emoji fallback
+                // Use emoji fallback immediately
                 container.textContent = item.emoji;
+                return Promise.resolve();
             }
         }
 
