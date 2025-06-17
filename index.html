@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com https://text.pollinations.ai;
         connect-src 'self' https://text.pollinations.ai https://image.pollinations.ai;
         frame-src 'self' https://www.youtube.com https://trytako.com;
@@ -693,7 +695,7 @@
                         </svg>
                         Discord Server
                     </a>
-                    <a href="https://github.com/aeromechanic000/note-assistant" target="_blank" rel="noopener noreferrer" class="social-link">
+                    <a href="https://github.com/aeromechanic000/craft-master" target="_blank" rel="noopener noreferrer" class="social-link">
                         <svg class="social-icon" viewBox="0 0 24 24">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
                         </svg>
@@ -754,7 +756,7 @@
                     <div class="info-title">🖱️ Controls</div>
                     <div class="info-content">
                         <div><strong>Left-click drag:</strong> Move all items</div>
-                        <div><strong>Right-click drag:</strong> Move half items</div>
+                        <div><strong>Ctrl+Left-click drag:</strong> Move half items</div>
                         <div><strong>Shift+Left-click drag:</strong> Move 1 item</div>
                         <div><strong>Click crafting/recycle slot:</strong> Return to storage</div>
                         <div>Crafting only consumes 1 item per slot</div>
@@ -804,7 +806,7 @@
         </div>
         
         <div class="status-bar">
-            <div id="status-text">🎮 Welcome to Craft Master! Drag controls: Left-click=all, Right-click=half, Shift+Left-click=1 item!</div>
+            <div id="status-text">🎮 Welcome to Craft Master! Drag controls: Left-click=all, Ctrl+Left-click=half, Shift+Left-click=1 item!</div>
             <div>Level Progress: Complete crafting challenges to advance!</div>
         </div>
     </div>
@@ -1113,7 +1115,7 @@
             // Add controls info for storage items
             const slotType = e.target.closest('.item-slot, .recycle-slot')?.dataset.type;
             if (slotType === 'initial' || slotType === 'crafted') {
-                content += `<div class="tooltip-controls">Left-click: All • Right-click: Half • Shift+Left: 1</div>`;
+                content += `<div class="tooltip-controls">Left-click: All • Ctrl+Left: Half • Shift+Left: 1</div>`;
             }
             
             tooltip.innerHTML = content;
@@ -1379,7 +1381,7 @@
             const levelsLoaded = await loadLevels();
             
             // Update status based on what was loaded
-            let statusMessage = '🎮 New controls working! ';
+            let statusMessage = '🎮 New drag controls! ';
             if (recipesLoaded && levelsLoaded) {
                 statusMessage += 'All data loaded from JSON files.';
             } else if (recipesLoaded) {
@@ -1501,7 +1503,7 @@
             return slot;
         }
 
-        // FIXED: Simplified mouse down handler
+        // UPDATED: Changed right-click to Ctrl+Left-click
         function handleMouseDown(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
@@ -1527,17 +1529,23 @@
             // Set draggable
             slot.draggable = true;
             
-            // Determine drag mode for storage areas
+            // Determine drag mode for storage areas (only left-click combinations now)
             if (type === 'initial' || type === 'crafted') {
-                if (e.button === 2) {
-                    // Right-click
-                    e.preventDefault();
-                    dragState.dragMode = item.count > 1 ? 'half' : 'all';
-                } else if (e.button === 0 && e.shiftKey) {
-                    // Shift+Left-click
-                    dragState.dragMode = item.count > 1 ? 'one' : 'all';
+                if (e.button === 0) {
+                    // Left-click with modifiers
+                    if (e.ctrlKey && item.count > 1) {
+                        // Ctrl+Left-click: move half
+                        dragState.dragMode = 'half';
+                        e.preventDefault(); // Prevent any default behavior
+                    } else if (e.shiftKey && item.count > 1) {
+                        // Shift+Left-click: move 1
+                        dragState.dragMode = 'one';
+                    } else {
+                        // Regular left-click: move all
+                        dragState.dragMode = 'all';
+                    }
                 } else {
-                    // Regular left-click
+                    // Non-left clicks default to move all
                     dragState.dragMode = 'all';
                 }
             } else {
@@ -1670,7 +1678,7 @@
             }
         }
 
-        // FIXED: Simplified drag start handler
+        // Simplified drag start handler
         function handleDragStart(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
@@ -1715,7 +1723,7 @@
             console.log(`Dragging ${dragCount} of ${item.count} ${item.type} (mode: ${dragState.dragMode})`);
         }
 
-        // FIXED: Added drag end handler to clean up
+        // Added drag end handler to clean up
         function handleDragEnd(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             slot.classList.remove('dragging');
@@ -1795,7 +1803,7 @@
             checkRecipe();
         }
 
-        // FIXED: Simplified source update
+        // Simplified source update
         function updateSourceAfterDrag() {
             const sourceStorage = getSourceStorage();
             if (!sourceStorage) return;
@@ -2180,13 +2188,7 @@
             }
         });
 
-        // Prevent context menu globally on right-click
-        document.addEventListener('contextmenu', function(e) {
-            if (e.target.closest('.item-slot, .recycle-slot')) {
-                e.preventDefault();
-                return false;
-            }
-        });
+        // No longer need to prevent context menu globally since we're not using right-click
     </script>
 
 
