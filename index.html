@@ -1304,7 +1304,8 @@
             draggedItem: null,
             draggedFrom: null,
             draggedIndex: null,
-            isRightClick: false
+            isRightClick: false,
+            rightClickPending: false
         };
 
         // Load recipes from JSON file
@@ -1379,7 +1380,7 @@
             const levelsLoaded = await loadLevels();
             
             // Update status based on what was loaded
-            let statusMessage = '🎮 Fixed right-click drag and crafting! ';
+            let statusMessage = '🎮 Right-click drag now working! ';
             if (recipesLoaded && levelsLoaded) {
                 statusMessage += 'All data loaded from JSON files.';
             } else if (recipesLoaded) {
@@ -1500,7 +1501,7 @@
             return slot;
         }
 
-        // Fixed mouse down handler to properly detect right-click
+        // FIXED: Completely redesigned mouse down handler
         function handleMouseDown(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
@@ -1517,18 +1518,30 @@
                 item = gameState.recycleGrid[index];
             }
             
-            // Only enable dragging if there's an item
-            if (item) {
-                slot.draggable = true;
+            // Only proceed if there's an item
+            if (!item) {
+                slot.draggable = false;
+                return;
+            }
+            
+            // Set draggable
+            slot.draggable = true;
+            
+            // Handle right-click for storage areas only
+            if (e.button === 2 && (type === 'initial' || type === 'crafted')) {
+                e.preventDefault(); // Prevent context menu immediately
                 
-                // Set right-click flag for storage items with count > 1
-                if (e.button === 2 && (type === 'initial' || type === 'crafted') && item.count > 1) {
+                if (item.count > 1) {
+                    dragState.rightClickPending = true;
                     dragState.isRightClick = true;
+                    console.log('Right-click detected on', item.type, 'with count', item.count);
                 } else {
+                    dragState.rightClickPending = false;
                     dragState.isRightClick = false;
                 }
-            } else {
-                slot.draggable = false;
+            } else if (e.button === 0) {
+                // Left click
+                dragState.rightClickPending = false;
                 dragState.isRightClick = false;
             }
         }
@@ -1657,7 +1670,7 @@
             }
         }
 
-        // Fixed drag start handler
+        // FIXED: Updated drag start handler to use the pending right-click state
         function handleDragStart(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
@@ -1679,8 +1692,8 @@
                 dragState.draggedFrom = type;
                 dragState.draggedIndex = index;
                 
-                // Create the dragged item based on whether it was a right-click drag
-                if (dragState.isRightClick && item.count > 1 && (type === 'initial' || type === 'crafted')) {
+                // Use the pending right-click state that was set in mousedown
+                if (dragState.rightClickPending && dragState.isRightClick && item.count > 1 && (type === 'initial' || type === 'crafted')) {
                     // Right-click: drag half (rounded up)
                     const halfCount = Math.ceil(item.count / 2);
                     dragState.draggedItem = { type: item.type, count: halfCount };
@@ -1696,6 +1709,9 @@
                 
                 // Hide tooltip when dragging starts
                 hideTooltip();
+                
+                // Reset the pending state
+                dragState.rightClickPending = false;
             }
         }
 
@@ -1804,8 +1820,10 @@
             return null;
         }
 
+        // FIXED: Updated context menu handler
         function handleContextMenu(e) {
-            e.preventDefault(); // Prevent browser context menu
+            e.preventDefault(); // Always prevent context menu from showing
+            return false;
         }
 
         function handleSlotClick(e) {
@@ -1869,6 +1887,7 @@
             dragState.draggedFrom = null;
             dragState.draggedIndex = null;
             dragState.isRightClick = false;
+            dragState.rightClickPending = false;
             
             document.querySelectorAll('.item-slot, .recycle-slot').forEach(slot => {
                 slot.classList.remove('dragging', 'drop-target');
@@ -2154,6 +2173,14 @@
         document.addEventListener('dragstart', function(e) {
             if (e.target.tagName === 'IMG') {
                 e.preventDefault();
+            }
+        });
+
+        // FIXED: Prevent context menu globally on right-click
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('.item-slot, .recycle-slot')) {
+                e.preventDefault();
+                return false;
             }
         });
     </script>
