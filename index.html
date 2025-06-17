@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com https://text.pollinations.ai;
         connect-src 'self' https://text.pollinations.ai https://image.pollinations.ai;
@@ -352,6 +350,8 @@
             font-weight: bold;
             line-height: 1;
             z-index: 1;
+            min-width: 16px;
+            text-align: center;
         }
 
         /* Updated recipe result styling - more prominent */
@@ -590,6 +590,13 @@
             font-weight: bold;
         }
 
+        .tooltip-controls {
+            color: #CCCCCC;
+            font-size: 10px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
         @media (max-width: 1400px) {
             .main-content {
                 padding: 15px;
@@ -735,12 +742,21 @@
                     <div class="info-title">💡 Crafting Hints</div>
                     <div class="info-content">
                         <ul class="hints-list" id="crafting-hints">
-                            <li>🪵 Wood → 4x Planks</li>
-                            <li>🪵🪵 2 Wood → 4x Sticks</li>
-                            <li>⛏️ Pickaxe: 3 materials + 2 sticks</li>
-                            <li>⚔️ Sword: 2 materials + 1 stick</li>
-                            <li>🕯️ Torch: Coal + Stick</li>
+                            <li>🪵 Wood/Log → 4x Planks (any corner)</li>
+                            <li>⛏️ Pickaxe: 3 materials top row + 2 sticks center column</li>
+                            <li>⚔️ Sword: 2 materials + 1 stick (vertical line)</li>
+                            <li>🕯️ Torch: Coal above stick</li>
+                            <li>📦 Chest: 8 planks in hollow square</li>
                         </ul>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">🖱️ Controls</div>
+                    <div class="info-content">
+                        <div>Left Click + Drag: Move all items</div>
+                        <div>Right Click + Drag: Move half items</div>
+                        <div>Click crafting/recycle slot: Return to storage</div>
                     </div>
                 </div>
             </div>
@@ -787,7 +803,7 @@
         </div>
         
         <div class="status-bar">
-            <div id="status-text">🎮 Welcome to Craft Master! Drag items to craft and score points!</div>
+            <div id="status-text">🎮 Welcome to Craft Master! Left-click drag all items, right-click drag half!</div>
             <div>Level Progress: Complete crafting challenges to advance!</div>
         </div>
     </div>
@@ -805,7 +821,7 @@
             recycleGrid: Array(5).fill(null)
         };
 
-        // Item definitions with emojis and scores - now includes type (item/block)
+        // Item definitions with emojis and scores
         const items = {
             wood: { emoji: '🪵', score: 1, name: 'Wood', type: 'item' },
             oak_log: { emoji: '🪵', score: 1, name: 'Oak Log', type: 'block' },
@@ -834,8 +850,236 @@
             furnace: { emoji: '🔥', score: 30, name: 'Furnace', type: 'block' },
             bed: { emoji: '🛏️', score: 22, name: 'Bed', type: 'item' },
             crafting_table: { emoji: '🪑', score: 16, name: 'Crafting Table', type: 'block' },
-            table: { emoji: '🪑', score: 16, name: 'Crafting Table', type: 'block' }
+            table: { emoji: '🪑', score: 16, name: 'Crafting Table', type: 'block' },
+            wooden_shovel: { emoji: '🗨️', score: 12, name: 'Wooden Shovel', type: 'item' },
+            stone_shovel: { emoji: '🗨️', score: 15, name: 'Stone Shovel', type: 'item' },
+            iron_shovel: { emoji: '🗨️', score: 20, name: 'Iron Shovel', type: 'item' },
+            wooden_hoe: { emoji: '🪝', score: 12, name: 'Wooden Hoe', type: 'item' },
+            stone_hoe: { emoji: '🪝', score: 15, name: 'Stone Hoe', type: 'item' },
+            iron_hoe: { emoji: '🪝', score: 20, name: 'Iron Hoe', type: 'item' },
+            fence: { emoji: '🪙', score: 10, name: 'Fence', type: 'block' },
+            ladder: { emoji: '🪜', score: 8, name: 'Ladder', type: 'block' },
+            sign: { emoji: '🪧', score: 6, name: 'Sign', type: 'item' },
+            bowl: { emoji: '🍶', score: 4, name: 'Bowl', type: 'item' },
+            boat: { emoji: '⛵', score: 18, name: 'Boat', type: 'item' }
         };
+
+        // Shape-based recipes with proper 3x3 grid patterns
+        const shapeRecipes = [
+            // Basic crafting (single item)
+            {
+                pattern: [
+                    ['wood', null, null],
+                    [null, null, null],
+                    [null, null, null]
+                ],
+                result: 'oak_planks',
+                count: 4
+            },
+            {
+                pattern: [
+                    ['oak_log', null, null],
+                    [null, null, null],
+                    [null, null, null]
+                ],
+                result: 'oak_planks',
+                count: 4
+            },
+            // Sticks (vertical arrangement)
+            {
+                pattern: [
+                    ['oak_planks', null, null],
+                    ['oak_planks', null, null],
+                    [null, null, null]
+                ],
+                result: 'stick',
+                count: 4
+            },
+            {
+                pattern: [
+                    ['plank', null, null],
+                    ['plank', null, null],
+                    [null, null, null]
+                ],
+                result: 'stick',
+                count: 4
+            },
+            // Torches
+            {
+                pattern: [
+                    ['coal', null, null],
+                    ['stick', null, null],
+                    [null, null, null]
+                ],
+                result: 'torch',
+                count: 4
+            },
+            // Wooden Pickaxe
+            {
+                pattern: [
+                    ['oak_planks', 'oak_planks', 'oak_planks'],
+                    [null, 'stick', null],
+                    [null, 'stick', null]
+                ],
+                result: 'wooden_pickaxe',
+                count: 1
+            },
+            {
+                pattern: [
+                    ['plank', 'plank', 'plank'],
+                    [null, 'stick', null],
+                    [null, 'stick', null]
+                ],
+                result: 'wooden_pickaxe',
+                count: 1
+            },
+            // Stone Pickaxe
+            {
+                pattern: [
+                    ['stone', 'stone', 'stone'],
+                    [null, 'stick', null],
+                    [null, 'stick', null]
+                ],
+                result: 'stone_pickaxe',
+                count: 1
+            },
+            // Iron Pickaxe
+            {
+                pattern: [
+                    ['iron_ingot', 'iron_ingot', 'iron_ingot'],
+                    [null, 'stick', null],
+                    [null, 'stick', null]
+                ],
+                result: 'iron_pickaxe',
+                count: 1
+            },
+            // Wooden Sword
+            {
+                pattern: [
+                    ['oak_planks', null, null],
+                    ['oak_planks', null, null],
+                    ['stick', null, null]
+                ],
+                result: 'wooden_sword',
+                count: 1
+            },
+            {
+                pattern: [
+                    ['plank', null, null],
+                    ['plank', null, null],
+                    ['stick', null, null]
+                ],
+                result: 'wooden_sword',
+                count: 1
+            },
+            // Stone Sword
+            {
+                pattern: [
+                    ['stone', null, null],
+                    ['stone', null, null],
+                    ['stick', null, null]
+                ],
+                result: 'stone_sword',
+                count: 1
+            },
+            // Iron Sword
+            {
+                pattern: [
+                    ['iron_ingot', null, null],
+                    ['iron_ingot', null, null],
+                    ['stick', null, null]
+                ],
+                result: 'iron_sword',
+                count: 1
+            },
+            // Wooden Axe
+            {
+                pattern: [
+                    ['oak_planks', 'oak_planks', null],
+                    ['oak_planks', 'stick', null],
+                    [null, 'stick', null]
+                ],
+                result: 'wooden_axe',
+                count: 1
+            },
+            {
+                pattern: [
+                    ['plank', 'plank', null],
+                    ['plank', 'stick', null],
+                    [null, 'stick', null]
+                ],
+                result: 'wooden_axe',
+                count: 1
+            },
+            // Stone Axe
+            {
+                pattern: [
+                    ['stone', 'stone', null],
+                    ['stone', 'stick', null],
+                    [null, 'stick', null]
+                ],
+                result: 'stone_axe',
+                count: 1
+            },
+            // Chest (hollow square of planks)
+            {
+                pattern: [
+                    ['oak_planks', 'oak_planks', 'oak_planks'],
+                    ['oak_planks', null, 'oak_planks'],
+                    ['oak_planks', 'oak_planks', 'oak_planks']
+                ],
+                result: 'chest',
+                count: 1
+            },
+            {
+                pattern: [
+                    ['plank', 'plank', 'plank'],
+                    ['plank', null, 'plank'],
+                    ['plank', 'plank', 'plank']
+                ],
+                result: 'chest',
+                count: 1
+            },
+            // Furnace (hollow square of stone)
+            {
+                pattern: [
+                    ['stone', 'stone', 'stone'],
+                    ['stone', null, 'stone'],
+                    ['stone', 'stone', 'stone']
+                ],
+                result: 'furnace',
+                count: 1
+            },
+            // Crafting Table (2x2 planks)
+            {
+                pattern: [
+                    ['oak_planks', 'oak_planks', null],
+                    ['oak_planks', 'oak_planks', null],
+                    [null, null, null]
+                ],
+                result: 'crafting_table',
+                count: 1
+            },
+            {
+                pattern: [
+                    ['plank', 'plank', null],
+                    ['plank', 'plank', null],
+                    [null, null, null]
+                ],
+                result: 'crafting_table',
+                count: 1
+            },
+            // Door (vertical planks)
+            {
+                pattern: [
+                    ['oak_planks', 'oak_planks', null],
+                    ['oak_planks', 'oak_planks', null],
+                    ['oak_planks', 'oak_planks', null]
+                ],
+                result: 'oak_door',
+                count: 3
+            }
+        ];
 
         // Tooltip system
         let tooltip = null;
@@ -863,6 +1107,12 @@
             
             if (item.count && item.count > 1) {
                 content += `<div class="tooltip-count">Quantity: ${item.count}</div>`;
+            }
+            
+            // Add controls info for storage items
+            const slotType = e.target.closest('.item-slot, .recycle-slot')?.dataset.type;
+            if (slotType === 'initial' || slotType === 'crafted') {
+                content += `<div class="tooltip-controls">Left-click: Move all • Right-click: Move half</div>`;
             }
             
             tooltip.innerHTML = content;
@@ -1012,15 +1262,6 @@
             }
         }
 
-        // Fallback recipes (basic ones in case JSON loading fails)
-        const fallbackRecipes = {
-            'wood': { result: 'plank', count: 4, pattern: ['wood'] },
-            'oak_log': { result: 'oak_planks', count: 4, pattern: ['oak_log'] },
-            'wood,wood': { result: 'stick', count: 4, pattern: ['wood', 'wood'] },
-            'oak_planks,oak_planks': { result: 'stick', count: 4, pattern: ['oak_planks', 'oak_planks'] },
-            'stick,coal': { result: 'torch', count: 4, pattern: ['coal', 'stick'] }
-        };
-
         // Base fallback levels (will be updated with valid items after image validation)
         const baseFallbackLevels = [
             {
@@ -1053,7 +1294,7 @@
         ];
 
         // Game data will be loaded from JSON or use fallback
-        let recipes = {};
+        let recipes = [];
         let levels = [];
 
         // Drag and drop state
@@ -1061,7 +1302,8 @@
             dragging: false,
             draggedItem: null,
             draggedFrom: null,
-            draggedIndex: null
+            draggedIndex: null,
+            isRightClick: false
         };
 
         // Load recipes from JSON file
@@ -1074,17 +1316,17 @@
                 const data = await response.json();
                 
                 // Validate the loaded recipes
-                if (data && typeof data === 'object' && data.recipes) {
+                if (data && typeof data === 'object' && Array.isArray(data.recipes)) {
                     recipes = data.recipes;
-                    console.log('✅ Recipes loaded from JSON file:', Object.keys(recipes).length, 'recipes');
+                    console.log('✅ Recipes loaded from JSON file:', recipes.length, 'recipes');
                     return true;
                 } else {
                     throw new Error('Invalid JSON format');
                 }
             } catch (error) {
                 console.warn('⚠️ Failed to load recipes.json:', error.message);
-                recipes = fallbackRecipes;
-                console.log('📦 Using fallback recipes:', Object.keys(recipes).length, 'recipes');
+                recipes = shapeRecipes;
+                console.log('📦 Using fallback shape recipes:', recipes.length, 'recipes');
                 return false;
             }
         }
@@ -1136,7 +1378,7 @@
             const levelsLoaded = await loadLevels();
             
             // Update status based on what was loaded
-            let statusMessage = '🎮 Game initialized! ';
+            let statusMessage = '🎮 Shape-based crafting with item counts initialized! ';
             if (recipesLoaded && levelsLoaded) {
                 statusMessage += 'All data loaded from JSON files.';
             } else if (recipesLoaded) {
@@ -1152,42 +1394,26 @@
             // Hide loading indicator
             loadingIndicator.style.display = 'none';
             
-            // Update hints based on loaded recipes
+            // Update hints based on shape recipes
             updateCraftingHints();
             
             updateStatus(statusMessage);
         }
 
-        // Update crafting hints based on available recipes
+        // Update crafting hints based on shape recipes
         function updateCraftingHints() {
             const hintsElement = document.getElementById('crafting-hints');
-            const hints = [];
+            const hints = [
+                '🪵 Wood/Log → 4x Planks (any corner)',
+                '🪵🪵 2 Planks vertically → 4x Sticks',
+                '⛏️ Pickaxe: 3 materials top row + 2 sticks center column',
+                '⚔️ Sword: 2 materials + 1 stick (vertical line)',
+                '🕯️ Torch: Coal above stick',
+                '📦 Chest: 8 planks in hollow square',
+                '🔥 Furnace: 8 stones in hollow square'
+            ];
             
-            // Generate hints from recipes
-            for (const [key, recipe] of Object.entries(recipes)) {
-                const resultItem = items[recipe.result];
-                if (resultItem) {
-                    if (key === 'wood' || key === 'oak_log') {
-                        hints.push(`🪵 Wood/Log → ${recipe.count}x ${resultItem.name}`);
-                    } else if (key === 'wood,wood' || key === 'oak_planks,oak_planks') {
-                        hints.push(`🪵🪵 2 Planks → ${recipe.count}x ${resultItem.name}`);
-                    } else if (key === 'stick,coal') {
-                        hints.push(`🕯️ ${resultItem.name}: Coal + Stick`);
-                    } else if (recipe.result.includes('pickaxe')) {
-                        hints.push(`⛏️ ${resultItem.name}: 3 materials + 2 sticks`);
-                    } else if (recipe.result.includes('sword')) {
-                        hints.push(`⚔️ ${resultItem.name}: 2 materials + 1 stick`);
-                    } else if (recipe.result === 'chest') {
-                        hints.push(`📦 ${resultItem.name}: 8 planks in hollow square`);
-                    } else if (recipe.result === 'furnace') {
-                        hints.push(`🔥 ${resultItem.name}: 8 stones in hollow square`);
-                    }
-                }
-            }
-            
-            // Limit to 7 hints to fit in the UI
-            const displayHints = hints.slice(0, 7);
-            hintsElement.innerHTML = displayHints.map(hint => `<li>${hint}</li>`).join('');
+            hintsElement.innerHTML = hints.map(hint => `<li>${hint}</li>`).join('');
         }
 
         // Function to get random items from allowed items pool (with image validation)
@@ -1261,6 +1487,7 @@
             slot.addEventListener('dragover', handleDragOver);
             slot.addEventListener('drop', handleDrop);
             slot.addEventListener('click', handleSlotClick);
+            slot.addEventListener('contextmenu', handleContextMenu);
             
             // Add tooltip event listeners
             slot.addEventListener('mouseenter', handleTooltipShow);
@@ -1353,36 +1580,48 @@
             gameState.craftingGrid = Array(9).fill(null);
             gameState.recycleGrid = Array(5).fill(null);
 
-            // Add initial items for this level (only those with valid images)
+            // Add initial items for this level with random counts (1-8)
             const initialItems = getRandomItems(levelConfig.allowedItems, levelConfig.initialItemCount);
             initialItems.forEach(itemType => {
-                addItemToStorage(itemType, 'initial');
+                const count = Math.floor(Math.random() * 8) + 1; // Random count 1-8
+                addItemToStorage(itemType, 'initial', count);
             });
 
             updateUI();
             updateStatus(`Level ${levelNumber}: ${levelConfig.name} - Target Score: ${levelConfig.targetScore}`);
         }
 
-        function addItemToStorage(itemType, storageType) {
+        function addItemToStorage(itemType, storageType, count = 1) {
             const storage = storageType === 'initial' ? gameState.initialStorage : gameState.craftedStorage;
-            const emptyIndex = storage.findIndex(item => item === null);
             
-            if (emptyIndex !== -1) {
-                storage[emptyIndex] = { type: itemType, count: 1 };
-            } else if (storage.length < 24) {
-                storage.push({ type: itemType, count: 1 });
+            // Try to find an existing stack of the same item type
+            const existingIndex = storage.findIndex(item => item && item.type === itemType);
+            
+            if (existingIndex !== -1) {
+                // Add to existing stack
+                storage[existingIndex].count += count;
+            } else {
+                // Find empty slot or add new slot
+                const emptyIndex = storage.findIndex(item => item === null);
+                
+                if (emptyIndex !== -1) {
+                    storage[emptyIndex] = { type: itemType, count: count };
+                } else if (storage.length < 24) {
+                    storage.push({ type: itemType, count: count });
+                }
             }
         }
 
         function addRandomItems(count) {
             const currentLevel = levels[gameState.level - 1];
-            const randomItems = getRandomItems(currentLevel.allowedItems, count);
-            randomItems.forEach(itemType => {
-                addItemToStorage(itemType, 'initial');
-            });
+            for (let i = 0; i < count; i++) {
+                const randomItems = getRandomItems(currentLevel.allowedItems, 1);
+                const randomCount = Math.floor(Math.random() * 4) + 1; // Random count 1-4
+                addItemToStorage(randomItems[0], 'initial', randomCount);
+            }
         }
 
-        // Drag and Drop handlers
+        // Enhanced drag and drop handlers with right-click support
         function handleDragStart(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
@@ -1401,9 +1640,19 @@
             
             if (item) {
                 dragState.dragging = true;
-                dragState.draggedItem = item;
                 dragState.draggedFrom = type;
                 dragState.draggedIndex = index;
+                
+                // Create the dragged item based on whether it was a right-click drag
+                if (dragState.isRightClick && item.count > 1) {
+                    // Right-click: drag half (rounded up)
+                    const halfCount = Math.ceil(item.count / 2);
+                    dragState.draggedItem = { type: item.type, count: halfCount };
+                } else {
+                    // Left-click: drag all
+                    dragState.draggedItem = { type: item.type, count: item.count };
+                }
+                
                 slot.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
                 
@@ -1429,7 +1678,7 @@
             const targetIndex = parseInt(slot.dataset.index);
             
             if (dragState.dragging && dragState.draggedItem) {
-                // Check if target slot is empty or if it's a valid drop location
+                // Get target storage and item
                 let targetStorage = null;
                 let targetItem = null;
                 
@@ -1452,21 +1701,28 @@
                     targetItem = targetStorage[targetIndex];
                 }
                 
-                // Only proceed if target slot is empty
+                // Handle the drop
                 if (!targetItem) {
-                    // Remove item from source
-                    if (dragState.draggedFrom === 'initial') {
-                        gameState.initialStorage[dragState.draggedIndex] = null;
-                    } else if (dragState.draggedFrom === 'crafted') {
-                        gameState.craftedStorage[dragState.draggedIndex] = null;
-                    } else if (dragState.draggedFrom === 'crafting') {
-                        gameState.craftingGrid[dragState.draggedIndex] = null;
-                    } else if (dragState.draggedFrom === 'recycle') {
-                        gameState.recycleGrid[dragState.draggedIndex] = null;
-                    }
+                    // Empty slot - place item here
+                    targetStorage[targetIndex] = { ...dragState.draggedItem };
                     
-                    // Add item to target
-                    targetStorage[targetIndex] = dragState.draggedItem;
+                    // Remove/reduce from source
+                    updateSourceAfterDrag();
+                } else if (targetItem.type === dragState.draggedItem.type && 
+                          (targetType === 'initial' || targetType === 'crafted')) {
+                    // Same item type in storage slots - combine stacks
+                    targetItem.count += dragState.draggedItem.count;
+                    
+                    // Remove/reduce from source
+                    updateSourceAfterDrag();
+                } else if (targetType === 'initial' || targetType === 'crafted') {
+                    // Different item types in storage - try to swap
+                    const sourceStorage = getSourceStorage();
+                    if (sourceStorage) {
+                        // Swap items
+                        sourceStorage[dragState.draggedIndex] = { ...targetItem };
+                        targetStorage[targetIndex] = { ...dragState.draggedItem };
+                    }
                 }
             }
             
@@ -1475,7 +1731,68 @@
             checkRecipe();
         }
 
+        function updateSourceAfterDrag() {
+            const sourceStorage = getSourceStorage();
+            if (!sourceStorage) return;
+            
+            const sourceItem = sourceStorage[dragState.draggedIndex];
+            if (!sourceItem) return;
+            
+            if (dragState.isRightClick && sourceItem.count > dragState.draggedItem.count) {
+                // Right-click drag: reduce source by dragged amount
+                sourceItem.count -= dragState.draggedItem.count;
+            } else {
+                // Left-click drag or last items: remove completely
+                sourceStorage[dragState.draggedIndex] = null;
+            }
+        }
+
+        function getSourceStorage() {
+            if (dragState.draggedFrom === 'initial') {
+                return gameState.initialStorage;
+            } else if (dragState.draggedFrom === 'crafted') {
+                return gameState.craftedStorage;
+            } else if (dragState.draggedFrom === 'crafting') {
+                return gameState.craftingGrid;
+            } else if (dragState.draggedFrom === 'recycle') {
+                return gameState.recycleGrid;
+            }
+            return null;
+        }
+
+        function handleContextMenu(e) {
+            e.preventDefault(); // Prevent browser context menu
+            
+            const slot = e.target.closest('.item-slot, .recycle-slot');
+            const type = slot.dataset.type;
+            const index = parseInt(slot.dataset.index);
+            
+            // Only allow right-click drag from storage areas
+            if (type === 'initial' || type === 'crafted') {
+                let item = null;
+                if (type === 'initial') {
+                    item = gameState.initialStorage[index];
+                } else if (type === 'crafted') {
+                    item = gameState.craftedStorage[index];
+                }
+                
+                if (item && item.count > 1) {
+                    dragState.isRightClick = true;
+                    // Make the slot draggable for right-click
+                    slot.draggable = true;
+                    
+                    // Reset right-click flag after a short delay
+                    setTimeout(() => {
+                        dragState.isRightClick = false;
+                    }, 100);
+                }
+            }
+        }
+
         function handleSlotClick(e) {
+            // Prevent handling click if it was part of a drag operation
+            if (dragState.dragging) return;
+            
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
             const index = parseInt(slot.dataset.index);
@@ -1505,12 +1822,23 @@
         }
 
         function addItemToStorageArray(item, storageArray) {
+            // Try to find existing stack first
+            const existingIndex = storageArray.findIndex(slot => 
+                slot && slot.type === item.type
+            );
+            
+            if (existingIndex !== -1) {
+                storageArray[existingIndex].count += item.count;
+                return true;
+            }
+            
+            // Find empty slot
             const emptyIndex = storageArray.findIndex(slot => slot === null);
             if (emptyIndex !== -1) {
-                storageArray[emptyIndex] = item;
+                storageArray[emptyIndex] = { ...item };
                 return true;
             } else if (storageArray.length < 24) {
-                storageArray.push(item);
+                storageArray.push({ ...item });
                 return true;
             }
             return false;
@@ -1521,106 +1849,140 @@
             dragState.draggedItem = null;
             dragState.draggedFrom = null;
             dragState.draggedIndex = null;
+            dragState.isRightClick = false;
             
             document.querySelectorAll('.item-slot, .recycle-slot').forEach(slot => {
                 slot.classList.remove('dragging', 'drop-target');
+                // Reset draggable state
+                const type = slot.dataset.type;
+                const index = parseInt(slot.dataset.index);
+                
+                let hasItem = false;
+                if (type === 'initial') {
+                    hasItem = gameState.initialStorage[index] != null;
+                } else if (type === 'crafted') {
+                    hasItem = gameState.craftedStorage[index] != null;
+                } else if (type === 'crafting') {
+                    hasItem = gameState.craftingGrid[index] != null;
+                } else if (type === 'recycle') {
+                    hasItem = gameState.recycleGrid[index] != null;
+                }
+                
+                slot.draggable = hasItem;
             });
         }
 
+        // Shape-based recipe checking
         async function checkRecipe() {
-            const craftingItems = gameState.craftingGrid.filter(item => item !== null);
-            const pattern = gameState.craftingGrid.map(item => item ? item.type : null);
-            
-            let matchedRecipe = null;
-            
-            for (const [key, recipe] of Object.entries(recipes)) {
-                if (arraysEqual(pattern, recipe.pattern)) {
-                    matchedRecipe = recipe;
-                    break;
-                }
-            }
-            
-            if (!matchedRecipe) {
-                const itemCounts = {};
-                craftingItems.forEach(item => {
-                    itemCounts[item.type] = (itemCounts[item.type] || 0) + 1;
-                });
-                
-                const sortedItems = Object.keys(itemCounts).sort();
-                const recipeKey = sortedItems.join(',');
-                
-                if (recipes[recipeKey]) {
-                    matchedRecipe = recipes[recipeKey];
-                }
-            }
+            const matchedRecipe = findMatchingRecipe();
             
             const resultPreview = document.getElementById('result-preview');
             const resultText = document.getElementById('result-text');
             const craftBtn = document.getElementById('craft-btn');
             
-            if (matchedRecipe && craftingItems.length > 0) {
+            if (matchedRecipe) {
                 const resultItem = items[matchedRecipe.result];
                 await createItemDisplay(matchedRecipe.result, resultPreview);
                 resultText.textContent = `${resultItem.name} (x${matchedRecipe.count}) - ${resultItem.score * matchedRecipe.count} points`;
                 craftBtn.disabled = gameState.craftsLeft <= 0;
             } else {
                 resultPreview.innerHTML = '❓';
-                resultText.textContent = craftingItems.length > 0 ? 'No valid recipe' : 'Place items to see recipe';
+                const hasItems = gameState.craftingGrid.some(item => item !== null);
+                resultText.textContent = hasItems ? 'No valid recipe - check item placement!' : 'Place items to see recipe';
                 craftBtn.disabled = true;
             }
         }
 
-        function arraysEqual(a, b) {
-            if (a.length !== b.length) return false;
-            for (let i = 0; i < a.length; i++) {
-                if (a[i] !== b[i]) return false;
+        // Find matching recipe based on 3x3 grid shape
+        function findMatchingRecipe() {
+            const currentPattern = [];
+            
+            // Convert crafting grid to 3x3 pattern
+            for (let row = 0; row < 3; row++) {
+                currentPattern[row] = [];
+                for (let col = 0; col < 3; col++) {
+                    const index = row * 3 + col;
+                    const item = gameState.craftingGrid[index];
+                    currentPattern[row][col] = item ? item.type : null;
+                }
+            }
+            
+            // Check each recipe pattern
+            for (const recipe of recipes) {
+                if (patternsMatch(currentPattern, recipe.pattern)) {
+                    return recipe;
+                }
+                
+                // Also check rotated versions of the pattern
+                const rotated90 = rotatePattern(recipe.pattern);
+                const rotated180 = rotatePattern(rotated90);
+                const rotated270 = rotatePattern(rotated180);
+                
+                if (patternsMatch(currentPattern, rotated90) ||
+                    patternsMatch(currentPattern, rotated180) ||
+                    patternsMatch(currentPattern, rotated270)) {
+                    return recipe;
+                }
+                
+                // Check mirrored versions
+                const mirrored = mirrorPattern(recipe.pattern);
+                if (patternsMatch(currentPattern, mirrored)) {
+                    return recipe;
+                }
+            }
+            
+            return null;
+        }
+
+        // Check if two 3x3 patterns match
+        function patternsMatch(pattern1, pattern2) {
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    if (pattern1[row][col] !== pattern2[row][col]) {
+                        return false;
+                    }
+                }
             }
             return true;
+        }
+
+        // Rotate a 3x3 pattern 90 degrees clockwise
+        function rotatePattern(pattern) {
+            const rotated = [[], [], []];
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    rotated[col][2 - row] = pattern[row][col];
+                }
+            }
+            return rotated;
+        }
+
+        // Mirror a 3x3 pattern horizontally
+        function mirrorPattern(pattern) {
+            const mirrored = [];
+            for (let row = 0; row < 3; row++) {
+                mirrored[row] = [...pattern[row]].reverse();
+            }
+            return mirrored;
         }
 
         async function craftItem() {
             if (gameState.craftsLeft <= 0) return;
             
-            const craftingItems = gameState.craftingGrid.filter(item => item !== null);
-            const pattern = gameState.craftingGrid.map(item => item ? item.type : null);
-            
-            let matchedRecipe = null;
-            
-            for (const [key, recipe] of Object.entries(recipes)) {
-                if (arraysEqual(pattern, recipe.pattern)) {
-                    matchedRecipe = recipe;
-                    break;
-                }
-            }
-            
-            if (!matchedRecipe) {
-                const itemCounts = {};
-                craftingItems.forEach(item => {
-                    itemCounts[item.type] = (itemCounts[item.type] || 0) + 1;
-                });
-                
-                const sortedItems = Object.keys(itemCounts).sort();
-                const recipeKey = sortedItems.join(',');
-                
-                if (recipes[recipeKey]) {
-                    matchedRecipe = recipes[recipeKey];
-                }
-            }
+            const matchedRecipe = findMatchingRecipe();
             
             if (matchedRecipe) {
-                const consumedItemsCount = craftingItems.length;
+                const consumedItemsCount = gameState.craftingGrid.filter(item => item !== null).length;
                 gameState.craftingGrid = Array(9).fill(null);
                 
                 const resultItem = items[matchedRecipe.result];
-                for (let i = 0; i < matchedRecipe.count; i++) {
-                    addItemToStorage(matchedRecipe.result, 'crafted');
-                }
+                addItemToStorage(matchedRecipe.result, 'crafted', matchedRecipe.count);
                 
                 gameState.totalScore += resultItem.score * matchedRecipe.count;
                 gameState.craftsLeft--;
                 
-                // Add same number of random items as consumed
-                addRandomItems(consumedItemsCount);
+                // Add random items based on consumed count
+                addRandomItems(Math.ceil(consumedItemsCount / 2));
                 
                 updateUI();
                 checkRecipe();
@@ -1634,15 +1996,15 @@
             const recycledItems = gameState.recycleGrid.filter(item => item !== null);
             if (recycledItems.length === 0) return;
             
-            const recycledItemsCount = recycledItems.length;
+            const totalRecycledCount = recycledItems.reduce((sum, item) => sum + item.count, 0);
             gameState.recycleGrid = Array(5).fill(null);
             gameState.recyclesLeft--;
             
-            // Add same number of random items as recycled
-            addRandomItems(recycledItemsCount);
+            // Add random items based on recycled count
+            addRandomItems(Math.ceil(totalRecycledCount / 3));
             
             updateUI();
-            updateStatus(`Recycled ${recycledItemsCount} items and got new random items!`);
+            updateStatus(`Recycled ${totalRecycledCount} items and got new random items!`);
         }
 
         function clearCraftingTable() {
@@ -1706,7 +2068,8 @@
                     slot.classList.add('occupied');
                     slot.draggable = true;
                     
-                    if (item.count > 1) {
+                    // Always show count if > 1, or for crafting/recycle if = 1
+                    if (item.count > 1 || gridId === 'crafting-grid' || gridId === 'recycle-grid') {
                         let countElement = slot.querySelector('.item-count');
                         if (!countElement) {
                             countElement = document.createElement('div');
@@ -1714,6 +2077,13 @@
                             slot.appendChild(countElement);
                         }
                         countElement.textContent = item.count;
+                        
+                        // Hide count for single items in storage areas
+                        if (item.count === 1 && gridId !== 'crafting-grid' && gridId !== 'recycle-grid') {
+                            countElement.style.display = 'none';
+                        } else {
+                            countElement.style.display = 'block';
+                        }
                     } else {
                         const countElement = slot.querySelector('.item-count');
                         if (countElement) {
@@ -1741,8 +2111,14 @@
                 hideTooltip();
             }
         });
-    </script>
 
+        // Prevent default drag behavior on images
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+            }
+        });
+    </script>
 
 
 </body></html>
