@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com https://text.pollinations.ai;
         connect-src 'self' https://text.pollinations.ai https://image.pollinations.ai;
@@ -1379,7 +1379,7 @@
             const levelsLoaded = await loadLevels();
             
             // Update status based on what was loaded
-            let statusMessage = '🎮 Fixed crafting and right-click drag! ';
+            let statusMessage = '🎮 Fixed right-click drag and crafting! ';
             if (recipesLoaded && levelsLoaded) {
                 statusMessage += 'All data loaded from JSON files.';
             } else if (recipesLoaded) {
@@ -1500,45 +1500,36 @@
             return slot;
         }
 
-        // New mouse down handler to detect right-click before drag starts
+        // Fixed mouse down handler to properly detect right-click
         function handleMouseDown(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
             const index = parseInt(slot.dataset.index);
             
-            // Only handle right-click for storage areas
-            if (e.button === 2 && (type === 'initial' || type === 'crafted')) {
-                e.preventDefault();
+            let item = null;
+            if (type === 'initial') {
+                item = gameState.initialStorage[index];
+            } else if (type === 'crafted') {
+                item = gameState.craftedStorage[index];
+            } else if (type === 'crafting') {
+                item = gameState.craftingGrid[index];
+            } else if (type === 'recycle') {
+                item = gameState.recycleGrid[index];
+            }
+            
+            // Only enable dragging if there's an item
+            if (item) {
+                slot.draggable = true;
                 
-                let item = null;
-                if (type === 'initial') {
-                    item = gameState.initialStorage[index];
-                } else if (type === 'crafted') {
-                    item = gameState.craftedStorage[index];
-                }
-                
-                if (item && item.count > 1) {
+                // Set right-click flag for storage items with count > 1
+                if (e.button === 2 && (type === 'initial' || type === 'crafted') && item.count > 1) {
                     dragState.isRightClick = true;
-                    slot.draggable = true;
                 } else {
                     dragState.isRightClick = false;
                 }
-            } else if (e.button === 0) {
-                // Left click
+            } else {
+                slot.draggable = false;
                 dragState.isRightClick = false;
-                
-                let item = null;
-                if (type === 'initial') {
-                    item = gameState.initialStorage[index];
-                } else if (type === 'crafted') {
-                    item = gameState.craftedStorage[index];
-                } else if (type === 'crafting') {
-                    item = gameState.craftingGrid[index];
-                } else if (type === 'recycle') {
-                    item = gameState.recycleGrid[index];
-                }
-                
-                slot.draggable = !!item;
             }
         }
 
@@ -1666,7 +1657,7 @@
             }
         }
 
-        // Enhanced drag and drop handlers with right-click support
+        // Fixed drag start handler
         function handleDragStart(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
@@ -1693,9 +1684,11 @@
                     // Right-click: drag half (rounded up)
                     const halfCount = Math.ceil(item.count / 2);
                     dragState.draggedItem = { type: item.type, count: halfCount };
+                    console.log(`Right-click drag: Moving ${halfCount} of ${item.count} ${item.type}`);
                 } else {
                     // Left-click: drag all
                     dragState.draggedItem = { type: item.type, count: item.count };
+                    console.log(`Left-click drag: Moving all ${item.count} ${item.type}`);
                 }
                 
                 slot.classList.add('dragging');
@@ -1750,6 +1743,7 @@
                 if (!targetItem) {
                     // Empty slot - place item here
                     targetStorage[targetIndex] = { ...dragState.draggedItem };
+                    console.log(`Placed ${dragState.draggedItem.count} ${dragState.draggedItem.type} in empty slot`);
                     
                     // Remove/reduce from source
                     updateSourceAfterDrag();
@@ -1757,6 +1751,7 @@
                           (targetType === 'initial' || targetType === 'crafted')) {
                     // Same item type in storage slots - combine stacks
                     targetItem.count += dragState.draggedItem.count;
+                    console.log(`Combined stacks: ${targetItem.count} total ${targetItem.type}`);
                     
                     // Remove/reduce from source
                     updateSourceAfterDrag();
@@ -1767,6 +1762,7 @@
                         // Swap items
                         sourceStorage[dragState.draggedIndex] = { ...targetItem };
                         targetStorage[targetIndex] = { ...dragState.draggedItem };
+                        console.log(`Swapped ${dragState.draggedItem.type} with ${targetItem.type}`);
                     }
                 }
             }
@@ -1776,6 +1772,7 @@
             checkRecipe();
         }
 
+        // Fixed source update after drag
         function updateSourceAfterDrag() {
             const sourceStorage = getSourceStorage();
             if (!sourceStorage) return;
@@ -1786,9 +1783,11 @@
             if (dragState.isRightClick && sourceItem.count > dragState.draggedItem.count) {
                 // Right-click drag: reduce source by dragged amount
                 sourceItem.count -= dragState.draggedItem.count;
+                console.log(`Source reduced to ${sourceItem.count} ${sourceItem.type}`);
             } else {
                 // Left-click drag or last items: remove completely
                 sourceStorage[dragState.draggedIndex] = null;
+                console.log(`Source slot cleared`);
             }
         }
 
@@ -1993,15 +1992,20 @@
             const matchedRecipe = findMatchingRecipe();
             
             if (matchedRecipe) {
-                // Count how many items are being consumed (1 per occupied slot)
-                const consumedSlotsCount = gameState.craftingGrid.filter(item => item !== null).length;
+                console.log('Crafting recipe:', matchedRecipe);
                 
-                // Reduce count by 1 for each item in the crafting grid (only 1 per slot is consumed)
+                // Process each crafting slot - only consume 1 item per slot that has items
+                let consumedSlots = 0;
                 gameState.craftingGrid.forEach((item, index) => {
                     if (item) {
+                        console.log(`Slot ${index}: ${item.count} ${item.type} -> consuming 1`);
+                        consumedSlots++;
+                        
                         if (item.count > 1) {
+                            // Reduce count by 1
                             item.count -= 1;
                         } else {
+                            // Remove item completely
                             gameState.craftingGrid[index] = null;
                         }
                     }
@@ -2013,8 +2017,10 @@
                 gameState.totalScore += resultItem.score * matchedRecipe.count;
                 gameState.craftsLeft--;
                 
+                console.log(`Crafted ${matchedRecipe.count}x ${resultItem.name}, consumed ${consumedSlots} slots`);
+                
                 // Add random items based on consumed count
-                addRandomItems(Math.ceil(consumedSlotsCount / 2));
+                addRandomItems(Math.ceil(consumedSlots / 2));
                 
                 updateUI();
                 checkRecipe();
@@ -2151,6 +2157,7 @@
             }
         });
     </script>
+
 
 
 </body></html>
