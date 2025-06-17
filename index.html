@@ -754,9 +754,10 @@
                 <div class="info-card">
                     <div class="info-title">🖱️ Controls</div>
                     <div class="info-content">
-                        <div>Left Click + Drag: Move all items</div>
-                        <div>Right Click + Drag: Move half items</div>
+                        <div>Left Mouse + Drag: Move all items</div>
+                        <div>Right Mouse + Drag: Move half items</div>
                         <div>Click crafting/recycle slot: Return to storage</div>
+                        <div>Crafting only consumes 1 item per slot</div>
                     </div>
                 </div>
             </div>
@@ -1378,7 +1379,7 @@
             const levelsLoaded = await loadLevels();
             
             // Update status based on what was loaded
-            let statusMessage = '🎮 Shape-based crafting with item counts initialized! ';
+            let statusMessage = '🎮 Fixed crafting and right-click drag! ';
             if (recipesLoaded && levelsLoaded) {
                 statusMessage += 'All data loaded from JSON files.';
             } else if (recipesLoaded) {
@@ -1483,6 +1484,8 @@
             slot.dataset.type = type;
             slot.dataset.index = index;
             
+            // Add event listeners
+            slot.addEventListener('mousedown', handleMouseDown);
             slot.addEventListener('dragstart', handleDragStart);
             slot.addEventListener('dragover', handleDragOver);
             slot.addEventListener('drop', handleDrop);
@@ -1495,6 +1498,48 @@
             slot.addEventListener('mousemove', handleTooltipMove);
             
             return slot;
+        }
+
+        // New mouse down handler to detect right-click before drag starts
+        function handleMouseDown(e) {
+            const slot = e.target.closest('.item-slot, .recycle-slot');
+            const type = slot.dataset.type;
+            const index = parseInt(slot.dataset.index);
+            
+            // Only handle right-click for storage areas
+            if (e.button === 2 && (type === 'initial' || type === 'crafted')) {
+                e.preventDefault();
+                
+                let item = null;
+                if (type === 'initial') {
+                    item = gameState.initialStorage[index];
+                } else if (type === 'crafted') {
+                    item = gameState.craftedStorage[index];
+                }
+                
+                if (item && item.count > 1) {
+                    dragState.isRightClick = true;
+                    slot.draggable = true;
+                } else {
+                    dragState.isRightClick = false;
+                }
+            } else if (e.button === 0) {
+                // Left click
+                dragState.isRightClick = false;
+                
+                let item = null;
+                if (type === 'initial') {
+                    item = gameState.initialStorage[index];
+                } else if (type === 'crafted') {
+                    item = gameState.craftedStorage[index];
+                } else if (type === 'crafting') {
+                    item = gameState.craftingGrid[index];
+                } else if (type === 'recycle') {
+                    item = gameState.recycleGrid[index];
+                }
+                
+                slot.draggable = !!item;
+            }
         }
 
         function handleTooltipShow(e) {
@@ -1644,7 +1689,7 @@
                 dragState.draggedIndex = index;
                 
                 // Create the dragged item based on whether it was a right-click drag
-                if (dragState.isRightClick && item.count > 1) {
+                if (dragState.isRightClick && item.count > 1 && (type === 'initial' || type === 'crafted')) {
                     // Right-click: drag half (rounded up)
                     const halfCount = Math.ceil(item.count / 2);
                     dragState.draggedItem = { type: item.type, count: halfCount };
@@ -1762,31 +1807,6 @@
 
         function handleContextMenu(e) {
             e.preventDefault(); // Prevent browser context menu
-            
-            const slot = e.target.closest('.item-slot, .recycle-slot');
-            const type = slot.dataset.type;
-            const index = parseInt(slot.dataset.index);
-            
-            // Only allow right-click drag from storage areas
-            if (type === 'initial' || type === 'crafted') {
-                let item = null;
-                if (type === 'initial') {
-                    item = gameState.initialStorage[index];
-                } else if (type === 'crafted') {
-                    item = gameState.craftedStorage[index];
-                }
-                
-                if (item && item.count > 1) {
-                    dragState.isRightClick = true;
-                    // Make the slot draggable for right-click
-                    slot.draggable = true;
-                    
-                    // Reset right-click flag after a short delay
-                    setTimeout(() => {
-                        dragState.isRightClick = false;
-                    }, 100);
-                }
-            }
         }
 
         function handleSlotClick(e) {
@@ -1966,14 +1986,26 @@
             return mirrored;
         }
 
+        // Fixed crafting function - only consumes 1 item per slot
         async function craftItem() {
             if (gameState.craftsLeft <= 0) return;
             
             const matchedRecipe = findMatchingRecipe();
             
             if (matchedRecipe) {
-                const consumedItemsCount = gameState.craftingGrid.filter(item => item !== null).length;
-                gameState.craftingGrid = Array(9).fill(null);
+                // Count how many items are being consumed (1 per occupied slot)
+                const consumedSlotsCount = gameState.craftingGrid.filter(item => item !== null).length;
+                
+                // Reduce count by 1 for each item in the crafting grid (only 1 per slot is consumed)
+                gameState.craftingGrid.forEach((item, index) => {
+                    if (item) {
+                        if (item.count > 1) {
+                            item.count -= 1;
+                        } else {
+                            gameState.craftingGrid[index] = null;
+                        }
+                    }
+                });
                 
                 const resultItem = items[matchedRecipe.result];
                 addItemToStorage(matchedRecipe.result, 'crafted', matchedRecipe.count);
@@ -1982,7 +2014,7 @@
                 gameState.craftsLeft--;
                 
                 // Add random items based on consumed count
-                addRandomItems(Math.ceil(consumedItemsCount / 2));
+                addRandomItems(Math.ceil(consumedSlotsCount / 2));
                 
                 updateUI();
                 checkRecipe();
@@ -2068,7 +2100,7 @@
                     slot.classList.add('occupied');
                     slot.draggable = true;
                     
-                    // Always show count if > 1, or for crafting/recycle if = 1
+                    // Show count for crafting/recycle always, storage only if > 1
                     if (item.count > 1 || gridId === 'crafting-grid' || gridId === 'recycle-grid') {
                         let countElement = slot.querySelector('.item-count');
                         if (!countElement) {
