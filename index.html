@@ -1,6 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com https://text.pollinations.ai;
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com https://text.pollinations.ai;
         connect-src 'self' https://text.pollinations.ai https://image.pollinations.ai;
         frame-src 'self' https://www.youtube.com https://trytako.com;
         child-src 'self';
@@ -754,9 +753,10 @@
                 <div class="info-card">
                     <div class="info-title">🖱️ Controls</div>
                     <div class="info-content">
-                        <div>Left Mouse + Drag: Move all items</div>
-                        <div>Right Mouse + Drag: Move half items</div>
-                        <div>Click crafting/recycle slot: Return to storage</div>
+                        <div><strong>Left-click drag:</strong> Move all items</div>
+                        <div><strong>Right-click drag:</strong> Move half items</div>
+                        <div><strong>Shift+Left-click drag:</strong> Move 1 item</div>
+                        <div><strong>Click crafting/recycle slot:</strong> Return to storage</div>
                         <div>Crafting only consumes 1 item per slot</div>
                     </div>
                 </div>
@@ -804,7 +804,7 @@
         </div>
         
         <div class="status-bar">
-            <div id="status-text">🎮 Welcome to Craft Master! Left-click drag all items, right-click drag half!</div>
+            <div id="status-text">🎮 Welcome to Craft Master! Drag controls: Left-click=all, Right-click=half, Shift+Left-click=1 item!</div>
             <div>Level Progress: Complete crafting challenges to advance!</div>
         </div>
     </div>
@@ -1113,7 +1113,7 @@
             // Add controls info for storage items
             const slotType = e.target.closest('.item-slot, .recycle-slot')?.dataset.type;
             if (slotType === 'initial' || slotType === 'crafted') {
-                content += `<div class="tooltip-controls">Left-click: Move all • Right-click: Move half</div>`;
+                content += `<div class="tooltip-controls">Left-click: All • Right-click: Half • Shift+Left: 1</div>`;
             }
             
             tooltip.innerHTML = content;
@@ -1298,14 +1298,13 @@
         let recipes = [];
         let levels = [];
 
-        // Drag and drop state
+        // FIXED: Simplified drag and drop state
         let dragState = {
             dragging: false,
             draggedItem: null,
             draggedFrom: null,
             draggedIndex: null,
-            isRightClick: false,
-            rightClickPending: false
+            dragMode: 'all' // 'all', 'half', or 'one'
         };
 
         // Load recipes from JSON file
@@ -1380,7 +1379,7 @@
             const levelsLoaded = await loadLevels();
             
             // Update status based on what was loaded
-            let statusMessage = '🎮 Right-click drag now working! ';
+            let statusMessage = '🎮 New controls working! ';
             if (recipesLoaded && levelsLoaded) {
                 statusMessage += 'All data loaded from JSON files.';
             } else if (recipesLoaded) {
@@ -1488,6 +1487,7 @@
             // Add event listeners
             slot.addEventListener('mousedown', handleMouseDown);
             slot.addEventListener('dragstart', handleDragStart);
+            slot.addEventListener('dragend', handleDragEnd);
             slot.addEventListener('dragover', handleDragOver);
             slot.addEventListener('drop', handleDrop);
             slot.addEventListener('click', handleSlotClick);
@@ -1501,7 +1501,7 @@
             return slot;
         }
 
-        // FIXED: Completely redesigned mouse down handler
+        // FIXED: Simplified mouse down handler
         function handleMouseDown(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
@@ -1527,22 +1527,22 @@
             // Set draggable
             slot.draggable = true;
             
-            // Handle right-click for storage areas only
-            if (e.button === 2 && (type === 'initial' || type === 'crafted')) {
-                e.preventDefault(); // Prevent context menu immediately
-                
-                if (item.count > 1) {
-                    dragState.rightClickPending = true;
-                    dragState.isRightClick = true;
-                    console.log('Right-click detected on', item.type, 'with count', item.count);
+            // Determine drag mode for storage areas
+            if (type === 'initial' || type === 'crafted') {
+                if (e.button === 2) {
+                    // Right-click
+                    e.preventDefault();
+                    dragState.dragMode = item.count > 1 ? 'half' : 'all';
+                } else if (e.button === 0 && e.shiftKey) {
+                    // Shift+Left-click
+                    dragState.dragMode = item.count > 1 ? 'one' : 'all';
                 } else {
-                    dragState.rightClickPending = false;
-                    dragState.isRightClick = false;
+                    // Regular left-click
+                    dragState.dragMode = 'all';
                 }
-            } else if (e.button === 0) {
-                // Left click
-                dragState.rightClickPending = false;
-                dragState.isRightClick = false;
+            } else {
+                // For crafting/recycle grids, always move all
+                dragState.dragMode = 'all';
             }
         }
 
@@ -1670,7 +1670,7 @@
             }
         }
 
-        // FIXED: Updated drag start handler to use the pending right-click state
+        // FIXED: Simplified drag start handler
         function handleDragStart(e) {
             const slot = e.target.closest('.item-slot, .recycle-slot');
             const type = slot.dataset.type;
@@ -1687,31 +1687,44 @@
                 item = gameState.recycleGrid[index];
             }
             
-            if (item) {
-                dragState.dragging = true;
-                dragState.draggedFrom = type;
-                dragState.draggedIndex = index;
-                
-                // Use the pending right-click state that was set in mousedown
-                if (dragState.rightClickPending && dragState.isRightClick && item.count > 1 && (type === 'initial' || type === 'crafted')) {
-                    // Right-click: drag half (rounded up)
-                    const halfCount = Math.ceil(item.count / 2);
-                    dragState.draggedItem = { type: item.type, count: halfCount };
-                    console.log(`Right-click drag: Moving ${halfCount} of ${item.count} ${item.type}`);
-                } else {
-                    // Left-click: drag all
-                    dragState.draggedItem = { type: item.type, count: item.count };
-                    console.log(`Left-click drag: Moving all ${item.count} ${item.type}`);
-                }
-                
-                slot.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
-                
-                // Hide tooltip when dragging starts
-                hideTooltip();
-                
-                // Reset the pending state
-                dragState.rightClickPending = false;
+            if (!item) {
+                e.preventDefault();
+                return;
+            }
+            
+            dragState.dragging = true;
+            dragState.draggedFrom = type;
+            dragState.draggedIndex = index;
+            
+            // Calculate how many items to drag based on mode
+            let dragCount = item.count;
+            if (dragState.dragMode === 'half' && item.count > 1) {
+                dragCount = Math.ceil(item.count / 2);
+            } else if (dragState.dragMode === 'one' && item.count > 1) {
+                dragCount = 1;
+            }
+            
+            dragState.draggedItem = { type: item.type, count: dragCount };
+            
+            slot.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            
+            // Hide tooltip when dragging starts
+            hideTooltip();
+            
+            console.log(`Dragging ${dragCount} of ${item.count} ${item.type} (mode: ${dragState.dragMode})`);
+        }
+
+        // FIXED: Added drag end handler to clean up
+        function handleDragEnd(e) {
+            const slot = e.target.closest('.item-slot, .recycle-slot');
+            slot.classList.remove('dragging');
+            
+            // If drag was cancelled (no drop occurred), reset drag state
+            if (dragState.dragging) {
+                console.log('Drag cancelled, resetting state');
+                resetDragState();
+                updateUI();
             }
         }
 
@@ -1726,60 +1739,54 @@
         function handleDrop(e) {
             e.preventDefault();
             const slot = e.target.closest('.item-slot, .recycle-slot');
-            if (!slot) return;
+            if (!slot || !dragState.dragging || !dragState.draggedItem) {
+                resetDragState();
+                return;
+            }
             
             const targetType = slot.dataset.type;
             const targetIndex = parseInt(slot.dataset.index);
             
-            if (dragState.dragging && dragState.draggedItem) {
-                // Get target storage and item
-                let targetStorage = null;
-                let targetItem = null;
-                
-                if (targetType === 'initial') {
-                    targetStorage = gameState.initialStorage;
-                    targetItem = targetStorage[targetIndex];
-                } else if (targetType === 'crafted') {
-                    targetStorage = gameState.craftedStorage;
-                    targetItem = targetStorage[targetIndex];
-                    // Don't allow dropping items from crafting/recycle into crafted storage
-                    if (dragState.draggedFrom === 'crafting' || dragState.draggedFrom === 'recycle') {
-                        resetDragState();
-                        return;
-                    }
-                } else if (targetType === 'crafting') {
-                    targetStorage = gameState.craftingGrid;
-                    targetItem = targetStorage[targetIndex];
-                } else if (targetType === 'recycle') {
-                    targetStorage = gameState.recycleGrid;
-                    targetItem = targetStorage[targetIndex];
+            // Get target storage and item
+            let targetStorage = null;
+            let targetItem = null;
+            
+            if (targetType === 'initial') {
+                targetStorage = gameState.initialStorage;
+                targetItem = targetStorage[targetIndex];
+            } else if (targetType === 'crafted') {
+                targetStorage = gameState.craftedStorage;
+                targetItem = targetStorage[targetIndex];
+                // Don't allow dropping items from crafting/recycle into crafted storage
+                if (dragState.draggedFrom === 'crafting' || dragState.draggedFrom === 'recycle') {
+                    resetDragState();
+                    updateUI();
+                    return;
                 }
-                
-                // Handle the drop
-                if (!targetItem) {
-                    // Empty slot - place item here
+            } else if (targetType === 'crafting') {
+                targetStorage = gameState.craftingGrid;
+                targetItem = targetStorage[targetIndex];
+            } else if (targetType === 'recycle') {
+                targetStorage = gameState.recycleGrid;
+                targetItem = targetStorage[targetIndex];
+            }
+            
+            // Handle the drop
+            if (!targetItem) {
+                // Empty slot - place item here
+                targetStorage[targetIndex] = { ...dragState.draggedItem };
+                updateSourceAfterDrag();
+            } else if (targetItem.type === dragState.draggedItem.type && 
+                      (targetType === 'initial' || targetType === 'crafted')) {
+                // Same item type in storage slots - combine stacks
+                targetItem.count += dragState.draggedItem.count;
+                updateSourceAfterDrag();
+            } else if (targetType === 'initial' || targetType === 'crafted') {
+                // Different item types in storage - swap items
+                const sourceStorage = getSourceStorage();
+                if (sourceStorage) {
+                    sourceStorage[dragState.draggedIndex] = { ...targetItem };
                     targetStorage[targetIndex] = { ...dragState.draggedItem };
-                    console.log(`Placed ${dragState.draggedItem.count} ${dragState.draggedItem.type} in empty slot`);
-                    
-                    // Remove/reduce from source
-                    updateSourceAfterDrag();
-                } else if (targetItem.type === dragState.draggedItem.type && 
-                          (targetType === 'initial' || targetType === 'crafted')) {
-                    // Same item type in storage slots - combine stacks
-                    targetItem.count += dragState.draggedItem.count;
-                    console.log(`Combined stacks: ${targetItem.count} total ${targetItem.type}`);
-                    
-                    // Remove/reduce from source
-                    updateSourceAfterDrag();
-                } else if (targetType === 'initial' || targetType === 'crafted') {
-                    // Different item types in storage - try to swap
-                    const sourceStorage = getSourceStorage();
-                    if (sourceStorage) {
-                        // Swap items
-                        sourceStorage[dragState.draggedIndex] = { ...targetItem };
-                        targetStorage[targetIndex] = { ...dragState.draggedItem };
-                        console.log(`Swapped ${dragState.draggedItem.type} with ${targetItem.type}`);
-                    }
                 }
             }
             
@@ -1788,7 +1795,7 @@
             checkRecipe();
         }
 
-        // Fixed source update after drag
+        // FIXED: Simplified source update
         function updateSourceAfterDrag() {
             const sourceStorage = getSourceStorage();
             if (!sourceStorage) return;
@@ -1796,14 +1803,12 @@
             const sourceItem = sourceStorage[dragState.draggedIndex];
             if (!sourceItem) return;
             
-            if (dragState.isRightClick && sourceItem.count > dragState.draggedItem.count) {
-                // Right-click drag: reduce source by dragged amount
+            if (sourceItem.count > dragState.draggedItem.count) {
+                // Reduce source by dragged amount
                 sourceItem.count -= dragState.draggedItem.count;
-                console.log(`Source reduced to ${sourceItem.count} ${sourceItem.type}`);
             } else {
-                // Left-click drag or last items: remove completely
+                // Remove completely
                 sourceStorage[dragState.draggedIndex] = null;
-                console.log(`Source slot cleared`);
             }
         }
 
@@ -1820,9 +1825,8 @@
             return null;
         }
 
-        // FIXED: Updated context menu handler
         function handleContextMenu(e) {
-            e.preventDefault(); // Always prevent context menu from showing
+            e.preventDefault();
             return false;
         }
 
@@ -1844,7 +1848,7 @@
                 
                 updateUI();
                 checkRecipe();
-                hideTooltip(); // Hide tooltip after click
+                hideTooltip();
             } else if (type === 'recycle' && gameState.recycleGrid[index]) {
                 const item = gameState.recycleGrid[index];
                 gameState.recycleGrid[index] = null;
@@ -1854,7 +1858,7 @@
                 }
                 
                 updateUI();
-                hideTooltip(); // Hide tooltip after click
+                hideTooltip();
             }
         }
 
@@ -1886,11 +1890,11 @@
             dragState.draggedItem = null;
             dragState.draggedFrom = null;
             dragState.draggedIndex = null;
-            dragState.isRightClick = false;
-            dragState.rightClickPending = false;
+            dragState.dragMode = 'all';
             
             document.querySelectorAll('.item-slot, .recycle-slot').forEach(slot => {
                 slot.classList.remove('dragging', 'drop-target');
+                
                 // Reset draggable state
                 const type = slot.dataset.type;
                 const index = parseInt(slot.dataset.index);
@@ -2176,7 +2180,7 @@
             }
         });
 
-        // FIXED: Prevent context menu globally on right-click
+        // Prevent context menu globally on right-click
         document.addEventListener('contextmenu', function(e) {
             if (e.target.closest('.item-slot, .recycle-slot')) {
                 e.preventDefault();
@@ -2184,7 +2188,6 @@
             }
         });
     </script>
-
 
 
 </body></html>
